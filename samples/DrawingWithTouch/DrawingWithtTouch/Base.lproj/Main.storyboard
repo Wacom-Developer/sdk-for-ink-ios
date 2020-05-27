@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hfC-iM-0vd">
+                                <rect key="frame" x="38" y="42" width="524" height="30"/>
+                                <state key="normal" title="Part 1 - Ink engine setup">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="S0f-6V-f4g"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fGh-1r-tKT">
+                                <rect key="frame" x="38" y="94" width="524" height="30"/>
+                                <state key="normal" title="Part 2 - Building paths from touch input">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uwX-C0-23s"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NPa-Qx-8nu">
+                                <rect key="frame" x="38" y="146" width="524" height="30"/>
+                                <state key="normal" title="Part 3 - Smoothing">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="2o6-hw-Cig"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KUl-Ml-Gyx">
+                                <rect key="frame" x="38" y="198" width="524" height="30"/>
+                                <state key="normal" title="Part 4 - Semitransparent strokes">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="F1k-H6-pnx"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M6Q-7p-akL">
+                                <rect key="frame" x="38" y="250" width="524" height="30"/>
+                                <state key="normal" title="Part 5 - Preliminary path">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="e7Q-6U-gt9"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LaZ-9t-IVC">
+                                <rect key="frame" x="38" y="302" width="524" height="30"/>
+                                <state key="normal" title="Part 6 - Particle brush">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="lbF-55-yMn"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OvN-rs-fA2">
+                                <rect key="frame" x="283" y="550" width="35" height="30"/>
+                                <state key="normal" title="Back">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="back:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Gm8-Te-EEv"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="6" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ucS-vY-9LS">
+                                <rect key="frame" x="38" y="356" width="524" height="30"/>
+                                <state key="normal" title="Part 7 - Generate Bezier Path">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="partButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="V91-5I-ep2"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="hfC-iM-0vd" secondAttribute="trailing" constant="22" id="1t4-kf-Rhj"/>
+                            <constraint firstItem="fGh-1r-tKT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="36w-O7-Gze"/>
+                            <constraint firstItem="LaZ-9t-IVC" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="4k9-AY-fzJ"/>
+                            <constraint firstItem="KUl-Ml-Gyx" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="7FD-QQ-ARH"/>
+                            <constraint firstItem="KUl-Ml-Gyx" firstAttribute="top" secondItem="NPa-Qx-8nu" secondAttribute="bottom" constant="22" id="8WK-L5-sfh"/>
+                            <constraint firstAttribute="centerX" secondItem="OvN-rs-fA2" secondAttribute="centerX" id="9TU-M5-UXM"/>
+                            <constraint firstItem="hfC-iM-0vd" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="22" id="Ag1-lY-2qT"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="LaZ-9t-IVC" secondAttribute="trailing" constant="22" id="AhL-aH-NXt"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="KUl-Ml-Gyx" secondAttribute="trailing" constant="22" id="AsW-nA-UDn"/>
+                            <constraint firstItem="NPa-Qx-8nu" firstAttribute="top" secondItem="fGh-1r-tKT" secondAttribute="bottom" constant="22" id="DAI-JF-dV8"/>
+                            <constraint firstItem="ucS-vY-9LS" firstAttribute="top" secondItem="LaZ-9t-IVC" secondAttribute="bottom" constant="22" id="Eoa-hv-DrA"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="OvN-rs-fA2" secondAttribute="bottom" constant="20" id="Kla-cJ-Lj7"/>
+                            <constraint firstItem="fGh-1r-tKT" firstAttribute="top" secondItem="hfC-iM-0vd" secondAttribute="bottom" constant="22" id="Lph-d5-Nzn"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ucS-vY-9LS" secondAttribute="trailing" constant="22" id="Mki-Lr-FMO"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="fGh-1r-tKT" secondAttribute="trailing" constant="22" id="Pkq-pV-hvk"/>
+                            <constraint firstItem="hfC-iM-0vd" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="ZEW-kM-pKu"/>
+                            <constraint firstItem="M6Q-7p-akL" firstAttribute="top" secondItem="KUl-Ml-Gyx" secondAttribute="bottom" constant="22" id="lYN-U7-x8q"/>
+                            <constraint firstItem="LaZ-9t-IVC" firstAttribute="top" secondItem="M6Q-7p-akL" secondAttribute="bottom" constant="22" id="o7e-ce-PUd"/>
+                            <constraint firstItem="M6Q-7p-akL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="ovH-Zx-8G6"/>
+                            <constraint firstItem="NPa-Qx-8nu" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="pmD-53-1dq"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="NPa-Qx-8nu" secondAttribute="trailing" constant="22" id="s2o-Ra-hWI"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="M6Q-7p-akL" secondAttribute="trailing" constant="22" id="wf1-mv-OR5"/>
+                            <constraint firstItem="ucS-vY-9LS" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="22" id="xhq-gG-EWc"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="backButton" destination="OvN-rs-fA2" id="Vy2-2T-ALz"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="616" y="475"/>
+        </scene>
+    </scenes>
+</document>

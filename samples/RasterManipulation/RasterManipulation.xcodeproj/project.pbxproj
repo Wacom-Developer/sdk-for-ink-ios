@@ -1,0 +1,366 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		321843261A2F430C00DF20CD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 321843251A2F430C00DF20CD /* main.m */; };
+		321843291A2F430C00DF20CD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 321843281A2F430C00DF20CD /* AppDelegate.m */; };
+		3218432C1A2F430C00DF20CD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3218432B1A2F430C00DF20CD /* ViewController.m */; };
+		3218432F1A2F430C00DF20CD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3218432D1A2F430C00DF20CD /* Main.storyboard */; };
+		321843311A2F430C00DF20CD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 321843301A2F430C00DF20CD /* Images.xcassets */; };
+		321843341A2F430C00DF20CD /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321843321A2F430C00DF20CD /* LaunchScreen.xib */; };
+		3218434C1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 3218434B1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.m */; };
+		3218434F1A2F440A00DF20CD /* DrawView_ImageMasking.m in Sources */ = {isa = PBXBuildFile; fileRef = 3218434E1A2F440A00DF20CD /* DrawView_ImageMasking.m */; };
+		321843521A2F46F300DF20CD /* img.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 321843511A2F46F300DF20CD /* img.jpg */; };
+		89CBDAC01F853BA5009438C9 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 89CBDABF1F853BA5009438C9 /* libz.tbd */; };
+		89CBDAC21F853BAD009438C9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 89CBDAC11F853BAD009438C9 /* libc++.tbd */; };
+		89CBDAC41F853BBB009438C9 /* WILLCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89CBDAC31F853BB8009438C9 /* WILLCore.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		321843211A2F430C00DF20CD /* RasterManipulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RasterManipulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		321843241A2F430C00DF20CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		321843251A2F430C00DF20CD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		321843271A2F430C00DF20CD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		321843281A2F430C00DF20CD /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		3218432A1A2F430C00DF20CD /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		3218432B1A2F430C00DF20CD /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		3218432E1A2F430C00DF20CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		321843301A2F430C00DF20CD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		321843331A2F430C00DF20CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		3218434A1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView_DisplayingRasterImages.h; sourceTree = "<group>"; };
+		3218434B1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView_DisplayingRasterImages.m; sourceTree = "<group>"; };
+		3218434D1A2F440A00DF20CD /* DrawView_ImageMasking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView_ImageMasking.h; sourceTree = "<group>"; };
+		3218434E1A2F440A00DF20CD /* DrawView_ImageMasking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView_ImageMasking.m; sourceTree = "<group>"; };
+		321843511A2F46F300DF20CD /* img.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img.jpg; sourceTree = "<group>"; };
+		89CBDABF1F853BA5009438C9 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.0.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
+		89CBDAC11F853BAD009438C9 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.0.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
+		89CBDAC31F853BB8009438C9 /* WILLCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WILLCore.framework; path = ../../sdk/WILLCore.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3218431E1A2F430C00DF20CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				89CBDAC21F853BAD009438C9 /* libc++.tbd in Frameworks */,
+				89CBDAC41F853BBB009438C9 /* WILLCore.framework in Frameworks */,
+				89CBDAC01F853BA5009438C9 /* libz.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		321843221A2F430C00DF20CD /* RasterManipulation */ = {
+			isa = PBXGroup;
+			children = (
+				3218434A1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.h */,
+				3218434B1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.m */,
+				3218434D1A2F440A00DF20CD /* DrawView_ImageMasking.h */,
+				3218434E1A2F440A00DF20CD /* DrawView_ImageMasking.m */,
+				321843271A2F430C00DF20CD /* AppDelegate.h */,
+				321843281A2F430C00DF20CD /* AppDelegate.m */,
+				3218432A1A2F430C00DF20CD /* ViewController.h */,
+				3218432B1A2F430C00DF20CD /* ViewController.m */,
+				3218432D1A2F430C00DF20CD /* Main.storyboard */,
+				321843301A2F430C00DF20CD /* Images.xcassets */,
+				321843321A2F430C00DF20CD /* LaunchScreen.xib */,
+				321843231A2F430C00DF20CD /* Supporting Files */,
+			);
+			path = RasterManipulation;
+			sourceTree = "<group>";
+		};
+		321843231A2F430C00DF20CD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				321843511A2F46F300DF20CD /* img.jpg */,
+				321843241A2F430C00DF20CD /* Info.plist */,
+				321843251A2F430C00DF20CD /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		322DBBBD19DEC576007D2087 = {
+			isa = PBXGroup;
+			children = (
+				89CBDAC31F853BB8009438C9 /* WILLCore.framework */,
+				321843221A2F430C00DF20CD /* RasterManipulation */,
+				322DBBC919DEC592007D2087 /* Products */,
+				89CBDABE1F853BA5009438C9 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		322DBBC919DEC592007D2087 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				321843211A2F430C00DF20CD /* RasterManipulation.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		89CBDABE1F853BA5009438C9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				89CBDAC11F853BAD009438C9 /* libc++.tbd */,
+				89CBDABF1F853BA5009438C9 /* libz.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		321843201A2F430C00DF20CD /* RasterManipulation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 321843451A2F431300DF20CD /* Build configuration list for PBXNativeTarget "RasterManipulation" */;
+			buildPhases = (
+				3218431D1A2F430C00DF20CD /* Sources */,
+				3218431E1A2F430C00DF20CD /* Frameworks */,
+				3218431F1A2F430C00DF20CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RasterManipulation;
+			productName = RasterManipulation;
+			productReference = 321843211A2F430C00DF20CD /* RasterManipulation.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		322DBBBE19DEC576007D2087 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				TargetAttributes = {
+					321843201A2F430C00DF20CD = {
+						CreatedOnToolsVersion = 6.1;
+					};
+				};
+			};
+			buildConfigurationList = 322DBBC119DEC576007D2087 /* Build configuration list for PBXProject "RasterManipulation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 322DBBBD19DEC576007D2087;
+			productRefGroup = 322DBBC919DEC592007D2087 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				321843201A2F430C00DF20CD /* RasterManipulation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3218431F1A2F430C00DF20CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				321843521A2F46F300DF20CD /* img.jpg in Resources */,
+				3218432F1A2F430C00DF20CD /* Main.storyboard in Resources */,
+				321843341A2F430C00DF20CD /* LaunchScreen.xib in Resources */,
+				321843311A2F430C00DF20CD /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3218431D1A2F430C00DF20CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3218432C1A2F430C00DF20CD /* ViewController.m in Sources */,
+				321843291A2F430C00DF20CD /* AppDelegate.m in Sources */,
+				3218434C1A2F43B800DF20CD /* DrawView_DisplayingRasterImages.m in Sources */,
+				321843261A2F430C00DF20CD /* main.m in Sources */,
+				3218434F1A2F440A00DF20CD /* DrawView_ImageMasking.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		3218432D1A2F430C00DF20CD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3218432E1A2F430C00DF20CD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		321843321A2F430C00DF20CD /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				321843331A2F430C00DF20CD /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		321843411A2F430E00DF20CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../sdk\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = RasterManipulation/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/engine/bin/ios-x86+x64+armv7+arm64",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-hwr-ios/engine/bin/ios-x86+x64+armv7+arm64",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-hwr-ios-sample",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-inksearch-ios/engine/bin/ios-x86+x64+armv7+arm64",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wacom.will.samples.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		321843421A2F430E00DF20CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../sdk\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = RasterManipulation/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/engine/bin/ios-x86+x64+armv7+arm64",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-hwr-ios/engine/bin/ios-x86+x64+armv7+arm64",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-hwr-ios-sample",
+					"$(PROJECT_DIR)/RasterManipulation/MyScript/MyScript_Builder-inksearch-ios/engine/bin/ios-x86+x64+armv7+arm64",
+				);
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wacom.will.samples.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		322DBBC219DEC576007D2087 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		322DBBC319DEC576007D2087 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		321843451A2F431300DF20CD /* Build configuration list for PBXNativeTarget "RasterManipulation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				321843411A2F430E00DF20CD /* Debug */,
+				321843421A2F430E00DF20CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		322DBBC119DEC576007D2087 /* Build configuration list for PBXProject "RasterManipulation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				322DBBC219DEC576007D2087 /* Debug */,
+				322DBBC319DEC576007D2087 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 322DBBBE19DEC576007D2087 /* Project object */;
+}
