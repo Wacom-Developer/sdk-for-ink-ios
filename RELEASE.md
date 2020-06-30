@@ -1,4 +1,4 @@
-# SDK for ink - iOS
+# WILL SDK for ink - iOS
 
 ## Version 1.8.0
 

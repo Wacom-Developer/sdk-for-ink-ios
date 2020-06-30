@@ -18,7 +18,7 @@ You can find the sample project in the following location:
 ---
 ## Part 1: Displaying raster images
 
-Although the WILL SDK *Rasterizer* module is not a general-purpose 2D drawing engine, it can draw raster images. 
+Although the WILL SDK for ink *Rasterizer* module is not a general-purpose 2D drawing engine, it can draw raster images. 
 In this tutorial, you will display and mask images using the functionality provided in the SDK.
 
 In Part 1 of this tutorial, you will load and display a raster image. Part 1 of this tutorial continues on from Part 1 of Tutorial 1: Drawing with touch.

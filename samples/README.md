@@ -1,7 +1,7 @@
 # Tutorials
 
 
-The tutorials demonstrate how to use WILL SDK for iOS. 
+The tutorials demonstrate how to use WILL SDK for ink for iOS. 
 The tutorials are divided into parts, where each part describes the required steps for accomplishing a particular task. 
 The following tutorials are provided:
 

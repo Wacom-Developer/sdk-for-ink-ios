@@ -67,7 +67,7 @@ The WILL software library also provides a range of utility algorithms, including
 
 ## Platform support
 
-The WILL ink SDK provides platform-specific packages for iOS, Android, Windows Store, and Web.
+The WILL SDK for ink provides platform-specific packages for iOS, Android, Windows Store, and Web.
 These packages provide a deep integration with the hosting platform by using native packaging and programming techniques, and by providing platform-specific language bindings for all modules in the software library.
 
 Software applications often combine ink with other content, such as typed text and images.

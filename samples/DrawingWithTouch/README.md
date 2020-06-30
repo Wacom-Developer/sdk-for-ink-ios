@@ -1,6 +1,6 @@
 # Tutorial 1: Drawing with touch
 
-In this tutorial, you will use WILL SDK to draw strokes produced by the user's touch input. 
+In this tutorial, you will use WILL SDK for ink to draw strokes produced by the user's touch input. 
 The tutorial is divided into the following parts: 
 
 * [Part 1: Setting up the ink engine](#part-1-setting-up-the-ink-engine)
@@ -15,7 +15,7 @@ Each part builds on the previous part, extending and improving the functionality
 
 ## Prerequisites
 
-You will need WILL SDK to complete this tutorial. For more information see Getting started with WILL SDK for iOS.
+You will need WILL SDK for ink to complete this tutorial. For more information see Getting started with WILL SDK for ink for iOS.
 
 ## Source code
 You can find the sample project in the following location:
@@ -25,10 +25,10 @@ You can find the sample project in the following location:
 ---
 ## Part 1: Setting up the ink engine
 
-WILL SDK provides a 2D drawing engine that focuses primarily on inking. 
+WILL SDK for ink provides a 2D drawing engine that focuses primarily on inking. 
 It relies on OpenGL 2.0 and acts as a wrapper on the ```EAGLContext``` object.
 
-You can use WILL SDK for both onscreen and offscreen rendering. 
+You can use WILL SDK for ink for both onscreen and offscreen rendering. 
 When you draw to an instance of the ```UIView``` class added to the screen, you perform an onscreen rendering. 
 Alternatively, you can render in a texture that does not display on the screen. 
 Instead, you can read the pixels of the texture and create a ```UIImage``` object from it. 
@@ -81,7 +81,7 @@ Set the value of ```kEAGLDrawablePropertyRetainedBacking``` to ```YES```. This s
 
 The ```kEAGLDrawablePropertyColorFormat``` parameter specifies the color format of the view’s layer.
 
-The ```EAGLContext``` is created using the ```kEAGLRenderingAPIOpenGLES2``` constant because this is the minimum requirement of the OpenGL version needed by WILL SDK.
+The ```EAGLContext``` is created using the ```kEAGLRenderingAPIOpenGLES2``` constant because this is the minimum requirement of the OpenGL version needed by WILL SDK for ink.
 
 For more information on the ```EAGLContext``` configuration, see the iOS documentation.
 
@@ -591,7 +591,7 @@ The benefit is that the lag is eliminated, which is important for a good user ex
 ## Part 6: Using a particle brush
 
 Drawing a solid color stroke is useful, but you might want to do more. 
-WILL SDK provides an advanced stroke rendering method. 
+WILL SDK for ink provides an advanced stroke rendering method. 
 It can produce very expressive strokes at the cost of being more computationally expensive. 
 It draws a large number of small textures (called particles) scattered along the path of the stroke. 
 This is configured using the ```WCMStrokeBrush``` class.
@@ -650,11 +650,11 @@ You can save this value and later reset it so the stroke will be rendered exactl
 ---
 ## Part 7: Generating a Bezier path
 
-The paths that WILL SDK generates are Catmull-Rom splines that have a variable width. 
-WILL SDK can render them efficiently, but you might need to represent the shape of the stroke in a more standard way: a list of Bezier curves defining the boundaries of the stroke. 
+The paths that WILL SDK for ink generates are Catmull-Rom splines that have a variable width. 
+WILL SDK for ink can render them efficiently, but you might need to represent the shape of the stroke in a more standard way: a list of Bezier curves defining the boundaries of the stroke. 
 If you have this representation, you can render the stroke using Quartz or use it to produce an SVG or PDF document.
 
-WILL SDK provides the utility class ```WCMBezierPathUtils``` that produces an instance of the ```UIBezierPath``` class from a set of WILL paths.
+WILL SDK for ink provides the utility class ```WCMBezierPathUtils``` that produces an instance of the ```UIBezierPath``` class from a set of WILL paths.
 
 In Part 7 of this tutorial, you will generate a Bezier path from your stroke. 
 This part continues on from Part 5 of this tutorial.

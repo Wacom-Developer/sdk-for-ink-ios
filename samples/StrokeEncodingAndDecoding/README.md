@@ -23,7 +23,7 @@ You can find the sample project in the following location:
 ---
 ## Part 1: Creating a stroke model
 
-In this tutorial, you will learn how to use WILL SDK to encode strokes into compressed binary data and how to reconstruct strokes from encoded data.
+In this tutorial, you will learn how to use WILL SDK for ink to encode strokes into compressed binary data and how to reconstruct strokes from encoded data.
 
 In Part 1 of this tutorial, you will create a model to store strokes. 
 Part 1 of this tutorial continues on from Part 2 and Part 4 of Tutorial 1: Drawing with touch.
@@ -120,7 +120,7 @@ This is important because the ```pathAppendResult.wholePath``` object will chang
 
 ## Part 2: Serializing and deserializing strokes
 
-WILL SDK provides the ```WCMInkDecoder``` and ```WCMInkEncoder``` classes. 
+WILL SDK for ink provides the ```WCMInkDecoder``` and ```WCMInkEncoder``` classes. 
 The ```WCMInkEncoder``` class creates a compressed binary representation for a collection of strokes. 
 The ```WCMInkDecoder``` class reads this binary data and recreates the strokes. 
 The ```WCMDocument``` class can then encode the stroke data in a WILL Document file.

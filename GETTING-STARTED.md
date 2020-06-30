@@ -10,7 +10,7 @@ Download the SDK from https://developer.wacom.com/developer-dashboard
 
 * Login using your Wacom ID
 * Select **Downloads for ink**
-* Download **WILL SDK for iOS**
+* Download **WILL SDK for ink for iOS (version 3.0)**
 * Accept the End User License Agreement to use the SDK
 
 The downloaded Zip file contains the SDK with documentation.
@@ -19,16 +19,16 @@ The downloaded Zip file contains the SDK with documentation.
 
 The SDK is free of charge and does not need a license.
 
-## Using the WILL SDK
+## Using the WILL SDK for ink
 
 ### Folder structure
 The folder contains the following:
 
 `ios/`
-* `Samples/` This folder contains sample Xcode projects that demonstrate basic uses of WILL SDK. 
+* `Samples/` This folder contains sample Xcode projects that demonstrate basic uses of the SDK. 
 
-  * **DrawingWithTouch/** This tutorial demonstrates how to use WILL SDK to draw strokes produced by the user touch input.
-  * **StrokeEncodingAndDecoding/** This tutorial demonstrates how to use WILL SDK to encode strokes into a compressed binary data and how to reconstruct them.
+  * **DrawingWithTouch/** This tutorial demonstrates how to use the SDK to draw strokes produced by the user touch input.
+  * **StrokeEncodingAndDecoding/** This tutorial demonstrates how to use the SDK to encode strokes into a compressed binary data and how to reconstruct them.
   * **StrokeManipulationWithEraser/** This tutorial demonstrates how to make changes in a collection of strokes by implementing an Eraser tool.
   * **StrokeManipulationWithSelection/** This tutorial demonstrates how to make changes in a collection of strokes by implementing a Selection tool.
   * **RasterManipulation/** This tutorial demonstrates how to load the `UIImage` class into the WILL context and mask it with paths created by touch input.
@@ -44,7 +44,7 @@ The folder contains the following:
 
 ## Tutorials
 
-The tutorials in this section demonstrate how to use WILL SDK for iOS. 
+The tutorials in this section demonstrate how to use WILL SDK for ink for iOS. 
 The tutorials are divided into parts, where each part describes the required steps for accomplishing a particular task. 
 The following tutorials are provided:
 
