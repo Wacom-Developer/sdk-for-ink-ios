@@ -400,8 +400,6 @@ class Pencil: RasterTool {
                     self.previousAlpha = alpha!
                 }
                 
-                print("size -> \(size)")
-                
                 var pathPoint = PathPoint(x: current!.x, y: current!.y)
                 pathPoint.alpha = alpha
                 pathPoint.size = size
