@@ -44,7 +44,7 @@ protocol RenderingProtocol {
 class RenderingModel: RenderingProtocol {
     var ink: InkBuilder?
     var preliminary: UIColor?
-    var color: UIColor = UIColor.clear
+    var inkColor: UIColor = UIColor.clear
     var defaultSize: Float = 0.0
     var predictedRect: CGRect? = nil
     

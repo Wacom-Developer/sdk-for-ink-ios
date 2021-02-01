@@ -34,7 +34,7 @@ class RasterBrushModel: RenderingModel {
         defaultSize = 3.0
     }
     
-    override var color: UIColor {
+    override var inkColor: UIColor {
         get {
             return strokeConstants.color
         }
@@ -147,6 +147,12 @@ class RasterBrushModel: RenderingModel {
     
     func selectCrayon(inputType: UITouch.TouchType, graphics: Graphics?) {
         ToolPalette.shared.selectedRasterTool = ToolPalette.shared.crayon
+        
+        updatePipelineForSelectedTool(inputType: inputType, graphics: graphics)
+    }
+    
+    func selectEraser(inputType: UITouch.TouchType, graphics: Graphics?) {
+        ToolPalette.shared.selectedRasterTool = ToolPalette.shared.rasterEraser
         
         updatePipelineForSelectedTool(inputType: inputType, graphics: graphics)
     }

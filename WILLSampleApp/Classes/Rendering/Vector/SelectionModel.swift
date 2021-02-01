@@ -33,8 +33,8 @@ class SelectionModel: ManipulationModel {
             clearSelectCanvas()
             selectCanvas = canvasCache.layer!.rect!.createCanvas()
             selectCanvas.path = path.cgPath
-            color = UIColor.randomFromArray()
-            selectCanvas.fillColor = color.cgColor
+            inkColor = UIColor.randomFromArray()
+            selectCanvas.fillColor = inkColor.cgColor
             instantUpdateBounds = nil
             canvasCache.layer!.metalLayer!.addSublayer(selectCanvas)
         } else {
@@ -43,8 +43,8 @@ class SelectionModel: ManipulationModel {
             
             canvas = canvasCache.layer!.rect!.createCanvas()
             canvas.path = path.cgPath
-            color = UIColor.random().withAlphaComponent(0.5)
-            canvas.fillColor = color.cgColor
+            inkColor = UIColor.random().withAlphaComponent(0.5)
+            canvas.fillColor = inkColor.cgColor
             instantUpdateBounds = nil
             canvasCache.layer!.metalLayer!.addSublayer(canvas)
         }

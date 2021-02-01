@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Qbl-ik-AcS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Qbl-ik-AcS">
     <device id="ipad10_5" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,10 +18,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gEr-TW-9IL">
-                                <rect key="frame" x="744" y="70" width="70" height="274"/>
+                                <rect key="frame" x="744" y="70" width="70" height="342"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Bet-3T-OVz">
-                                        <rect key="frame" x="5" y="5" width="60" height="264"/>
+                                        <rect key="frame" x="5" y="5" width="60" height="332"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JE3-y5-Myn">
                                                 <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -70,10 +71,22 @@
                                                     <action selector="didTapToolButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Zz1-GZ-TMf"/>
                                                 </connections>
                                             </button>
+                                            <button opaque="NO" alpha="0.0" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kyE-WF-VWz">
+                                                <rect key="frame" x="0.0" y="272" width="60" height="60"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="60" id="IwG-Pq-We3"/>
+                                                    <constraint firstAttribute="width" constant="60" id="Y8o-RC-3l6"/>
+                                                </constraints>
+                                                <color key="tintColor" red="0.52549019610000003" green="0.52549019610000003" blue="0.52549019610000003" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" image="btn_eraser"/>
+                                                <connections>
+                                                    <action selector="didTapToolButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="MSY-Cj-ZvK"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                     </stackView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="Bet-3T-OVz" firstAttribute="top" secondItem="gEr-TW-9IL" secondAttribute="top" constant="5" id="Iwx-ei-vLu"/>
                                     <constraint firstItem="Bet-3T-OVz" firstAttribute="leading" secondItem="gEr-TW-9IL" secondAttribute="leading" constant="5" id="MhA-5g-LUQ"/>
@@ -81,16 +94,25 @@
                                     <constraint firstAttribute="trailing" secondItem="Bet-3T-OVz" secondAttribute="trailing" constant="5" id="dL2-DO-XDf"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="laM-fZ-2GX">
+                                <rect key="frame" x="20" y="70" width="44" height="44"/>
+                                <state key="normal" image="btn_clear"/>
+                                <connections>
+                                    <action selector="didTapClearAll:" destination="BYZ-38-t0r" eventType="touchUpInside" id="F4l-nB-cgQ"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="laM-fZ-2GX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="XXr-Eh-ciW"/>
                             <constraint firstItem="gEr-TW-9IL" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="Y3W-OJ-g7h"/>
+                            <constraint firstItem="laM-fZ-2GX" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="pXF-mX-f5P"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gEr-TW-9IL" secondAttribute="trailing" constant="20" id="pYo-wO-5RD"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="c9X-sC-xnE">
-                        <barButtonItem key="leftBarButtonItem" title="Dismiss" id="WOP-fJ-Q8o">
+                        <barButtonItem key="leftBarButtonItem" title="Dismiss" style="done" id="WOP-fJ-Q8o">
                             <connections>
                                 <action selector="didTapDismiss:" destination="BYZ-38-t0r" id="lf6-7v-f2s"/>
                             </connections>
@@ -99,6 +121,7 @@
                     <connections>
                         <outlet property="configButton" destination="JE3-y5-Myn" id="GyF-Et-4Wu"/>
                         <outlet property="crayonButton" destination="Jf5-Oo-7iO" id="MxC-hn-q9r"/>
+                        <outlet property="eraserButton" destination="kyE-WF-VWz" id="hMz-WW-AB6"/>
                         <outlet property="pencilButton" destination="C6K-Vj-REV" id="l32-SJ-Ccg"/>
                         <outlet property="stackViewContainer" destination="gEr-TW-9IL" id="c3l-oA-Xhk"/>
                         <outlet property="waterBrushButton" destination="t0Q-oh-A6J" id="TIe-Jh-UzW"/>
@@ -217,14 +240,7 @@
                                     </button>
                                 </subviews>
                             </stackView>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="NQv-R5-aKM">
-                                <rect key="frame" x="357.5" y="70" width="119" height="32"/>
-                                <segments>
-                                    <segment title="Move"/>
-                                    <segment title="Rotate"/>
-                                </segments>
-                            </segmentedControl>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R41-kL-xIa">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R41-kL-xIa">
                                 <rect key="frame" x="20" y="1060" width="39" height="32"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <state key="normal" title="Load"/>
@@ -232,7 +248,7 @@
                                     <action selector="didTapLoad:" destination="pm6-kp-hdK" eventType="touchUpInside" id="UzG-PV-Q3M"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8K0-uL-owN">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8K0-uL-owN">
                                 <rect key="frame" x="67" y="1060" width="38" height="32"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <state key="normal" title="Save"/>
@@ -240,22 +256,50 @@
                                     <action selector="didTapSave:" destination="pm6-kp-hdK" eventType="touchUpInside" id="6np-gk-lce"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="NQv-R5-aKM">
+                                <rect key="frame" x="357.5" y="98" width="119" height="32"/>
+                                <segments>
+                                    <segment title="Move"/>
+                                    <segment title="Rotate"/>
+                                </segments>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BfS-K0-D4a">
+                                <rect key="frame" x="20" y="70" width="44" height="44"/>
+                                <state key="normal" image="btn_clear"/>
+                                <connections>
+                                    <action selector="didTapClearAll:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GSy-tI-QRV"/>
+                                    <action selector="didTapResetAll:" destination="pm6-kp-hdK" eventType="touchUpInside" id="7Zf-TY-c7C"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w9Y-p9-OHr">
+                                <rect key="frame" x="395" y="60" width="44" height="30"/>
+                                <state key="normal" title="Select">
+                                    <color key="titleColor" systemColor="labelColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="didTapSelect:" destination="pm6-kp-hdK" eventType="touchUpInside" id="FfD-t5-8nj"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="zKE-jf-Hqq"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="zKE-jf-Hqq" firstAttribute="bottom" secondItem="8K0-uL-owN" secondAttribute="bottom" constant="20" id="2gB-Rc-iMt"/>
                             <constraint firstItem="R41-kL-xIa" firstAttribute="leading" secondItem="zKE-jf-Hqq" secondAttribute="leading" constant="20" id="8L4-47-PJc"/>
                             <constraint firstItem="8K0-uL-owN" firstAttribute="leading" secondItem="R41-kL-xIa" secondAttribute="trailing" constant="8" id="8P6-Zn-v1H"/>
                             <constraint firstItem="NQv-R5-aKM" firstAttribute="centerX" secondItem="zKE-jf-Hqq" secondAttribute="centerX" id="KdB-ta-3b1"/>
                             <constraint firstItem="z08-xP-hwV" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="20" id="PvA-sx-4uJ"/>
-                            <constraint firstItem="NQv-R5-aKM" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="20" id="Sl0-Vq-REv"/>
+                            <constraint firstItem="NQv-R5-aKM" firstAttribute="top" secondItem="w9Y-p9-OHr" secondAttribute="bottom" constant="8" symbolic="YES" id="RuY-jl-hJN"/>
+                            <constraint firstItem="BfS-K0-D4a" firstAttribute="leading" secondItem="zKE-jf-Hqq" secondAttribute="leading" constant="20" id="Uih-2P-1kl"/>
+                            <constraint firstItem="w9Y-p9-OHr" firstAttribute="centerX" secondItem="zKE-jf-Hqq" secondAttribute="centerX" id="ggO-B1-fdM"/>
                             <constraint firstItem="zKE-jf-Hqq" firstAttribute="trailing" secondItem="z08-xP-hwV" secondAttribute="trailing" constant="20" id="iaV-pm-xo5"/>
+                            <constraint firstItem="BfS-K0-D4a" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="20" id="klc-OM-BuG"/>
+                            <constraint firstItem="w9Y-p9-OHr" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="10" id="niy-ci-WMQ"/>
                             <constraint firstItem="zKE-jf-Hqq" firstAttribute="bottom" secondItem="R41-kL-xIa" secondAttribute="bottom" constant="20" id="wBA-Dq-pWL"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="zKE-jf-Hqq"/>
                     </view>
                     <navigationItem key="navigationItem" id="W1J-Wg-39B">
-                        <barButtonItem key="leftBarButtonItem" title="Dismiss" id="SPe-lm-Z5E">
+                        <barButtonItem key="leftBarButtonItem" title="Dismiss" style="done" id="SPe-lm-Z5E">
                             <connections>
                                 <action selector="didTapDismiss:" destination="pm6-kp-hdK" id="hRS-e8-VKp"/>
                             </connections>
@@ -268,6 +312,8 @@
                         <outlet property="partialStrokeEraserButton" destination="c7k-tP-yT1" id="Osl-OH-afm"/>
                         <outlet property="partialStrokeSelectorButton" destination="7Xa-gm-sk7" id="fTJ-A6-KBv"/>
                         <outlet property="penButton" destination="8G9-xf-gJV" id="tEu-Ut-aJn"/>
+                        <outlet property="selectInkButton" destination="w9Y-p9-OHr" id="vE2-0y-bXS"/>
+                        <outlet property="toolSelectionButton" destination="HFG-s1-Kic" id="Ha5-ZO-jcf"/>
                         <outlet property="transformationTypeSegmentedControl" destination="NQv-R5-aKM" id="wfL-w3-5ZO"/>
                         <outlet property="wholeStrokeEraserButton" destination="VyC-Tr-cVm" id="4fc-KS-Day"/>
                         <outlet property="wholeStrokeSelectorButton" destination="tNJ-BI-NGw" id="ihJ-Im-m0l"/>
@@ -275,7 +321,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pAK-Gs-l5j" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2300.719424460432" y="133.81294964028777"/>
+            <point key="canvasLocation" x="2303" y="134"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Zav-Hy-gOS">
@@ -305,7 +351,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2fA-j7-9nM">
                                 <rect key="frame" x="386" y="529" width="62" height="104"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V6a-Kw-8Zc">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V6a-Kw-8Zc">
                                         <rect key="frame" x="0.0" y="67" width="62" height="37"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="21"/>
                                         <state key="normal" title="Raster"/>
@@ -313,7 +359,7 @@
                                             <segue destination="2ys-9d-CWN" kind="presentation" modalPresentationStyle="fullScreen" id="wrh-dW-DXB"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wk2-S0-AiU">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wk2-S0-AiU">
                                         <rect key="frame" x="0.0" y="0.0" width="62" height="37"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="21"/>
                                         <state key="normal" title="Vector"/>
@@ -322,7 +368,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="V6a-Kw-8Zc" firstAttribute="top" secondItem="Wk2-S0-AiU" secondAttribute="bottom" constant="30" id="6iM-DZ-Va3"/>
                                     <constraint firstItem="Wk2-S0-AiU" firstAttribute="top" secondItem="2fA-j7-9nM" secondAttribute="top" id="HSQ-IQ-BYJ"/>
@@ -334,12 +380,12 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="42F-Rn-FrD"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="2fA-j7-9nM" firstAttribute="centerY" secondItem="42F-Rn-FrD" secondAttribute="centerY" id="PNC-i8-AFh"/>
                             <constraint firstItem="2fA-j7-9nM" firstAttribute="centerX" secondItem="42F-Rn-FrD" secondAttribute="centerX" id="SdG-hw-7eb"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="42F-Rn-FrD"/>
                     </view>
                     <navigationItem key="navigationItem" id="zaJ-r8-Kdu"/>
                 </viewController>
@@ -384,8 +430,10 @@
     </scenes>
     <resources>
         <image name="btn_brush" width="44" height="44"/>
+        <image name="btn_clear" width="44" height="44"/>
         <image name="btn_config" width="44" height="44"/>
         <image name="btn_crayon" width="44" height="44"/>
+        <image name="btn_eraser" width="44" height="44"/>
         <image name="btn_feather" width="44" height="44"/>
         <image name="btn_lasso" width="44" height="44"/>
         <image name="btn_lasso_whole_stroke" width="44" height="44"/>
@@ -394,5 +442,11 @@
         <image name="btn_pencil" width="44" height="44"/>
         <image name="btn_water_brush" width="44" height="44"/>
         <image name="btn_whole_stroke_eraser" width="44" height="44"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

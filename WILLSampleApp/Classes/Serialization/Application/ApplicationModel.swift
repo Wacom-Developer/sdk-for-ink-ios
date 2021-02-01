@@ -90,6 +90,36 @@ class ApplicationModel {
         }
     }
     
+    func hasVectorInk(url: URL) -> Bool {
+        do {
+            let data = try Data(contentsOf: url)
+            let bytes = [UInt8](data)
+            let will3Codec = Will3Codec()
+            let decodedInkModel = will3Codec.decode(dataBuffer: bytes)
+            
+            return decodedInkModel.hasVectorInk
+        } catch let error {
+            print("error -> \(error)")
+        }
+        
+        return false
+    }
+    
+    func hasRasterInk(url: URL) -> Bool {
+        do {
+            let data = try Data(contentsOf: url)
+            let bytes = [UInt8](data)
+            let will3Codec = Will3Codec()
+            let decodedInkModel = will3Codec.decode(dataBuffer: bytes)
+            
+            return decodedInkModel.hasRasterInk
+        } catch let error {
+            print("error -> \(error)")
+        }
+        
+        return false
+    }
+    
     func read(from url: URL) -> ApplicationModel? {
         do {
             let data = try Data(contentsOf: url)

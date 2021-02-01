@@ -132,7 +132,7 @@ class SerializationQuartz2DController : UIViewController {
         selectionOverlapModeSegmentedControl.selectedSegmentIndex = 0
         selectionOverlapModeSegmentedControl.tintColor = UIColor.black
         
-        transformationTypeSegmentedControl = UISegmentedControl(items: TransformationType.allValues())
+        transformationTypeSegmentedControl = UISegmentedControl(items: ManipulationAction.allValues())
         transformationTypeSegmentedControl.frame = CGRect(x: selectionButton!.frame.maxX + 10, y: selectionButton!.frame.minY, width: 150, height: 30)
         transformationTypeSegmentedControl.selectedSegmentIndex = 0
         transformationTypeSegmentedControl.tintColor = UIColor.black
@@ -148,7 +148,7 @@ class SerializationQuartz2DController : UIViewController {
         isRTreeWholeStrokeSwitch.addTarget(self, action: #selector(isWholeStrokeSwitchStateChanged), for: .valueChanged)
         selectionButton!.addTarget(self, action: #selector(clickSelectionButton(sender:)), for: .touchUpInside)
         manipulatorCollectionTypeSegmentedControl.addTarget(self, action: #selector(selectCollectionType), for: UIControl.Event.valueChanged)
-        transformationTypeSegmentedControl.addTarget(self, action: #selector(selectTransformaion), for: UIControl.Event.valueChanged)
+        transformationTypeSegmentedControl.addTarget(self, action: #selector(selectManipulationAction), for: UIControl.Event.valueChanged)
         selectionOverlapModeSegmentedControl.addTarget(self, action: #selector(selectOverlap), for: .valueChanged)
         isErasingSwitch.addTarget(self, action: #selector(isErasingChanged), for: .valueChanged)
         
@@ -199,7 +199,7 @@ class SerializationQuartz2DController : UIViewController {
     @objc func rotatedView(_ sender: UIRotationGestureRecognizer) {
         if serializationModel?.selectedManipulationType == ManipulationType.select {
             
-            if serializationModel!.hasSelection && serializationModel!.selectedTransformationType == TransformationType.rotate {
+            if serializationModel!.hasSelection && serializationModel!.selectedManipulationAction == ManipulationAction.rotate {
                 if sender.state == .began {
                     serializationModel!.rotateBegan(sender)
                 } else if sender.state == .changed {
@@ -270,7 +270,7 @@ class SerializationQuartz2DController : UIViewController {
         selectCollectionTypeHandler()
     }
     
-    @objc func selectTransformaion(control: UISegmentedControl) {
+    @objc func selectManipulationAction(control: UISegmentedControl) {
         selectTransformationHandler()
     }
     
@@ -378,7 +378,7 @@ class SerializationQuartz2DController : UIViewController {
     }
     
     private func selectTransformationHandler() {
-        serializationModel!.set(transformationType: TransformationType(rawValue: transformationTypeSegmentedControl!.selectedSegmentIndex)!)
+        serializationModel!.set(transformationType: ManipulationAction(rawValue: transformationTypeSegmentedControl!.selectedSegmentIndex)!)
     }
     
     public func isRTreeLeavesShowHandler() {

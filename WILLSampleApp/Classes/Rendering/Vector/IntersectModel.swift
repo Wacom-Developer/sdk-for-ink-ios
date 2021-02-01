@@ -19,8 +19,8 @@ class IntersectModel: ManipulationModel {
         path = UIBezierPath()
         canvas = canvasCache.layer!.rect!.createCanvas()
         canvas.path = path.cgPath
-        color = activeManipulationType == ManipulationType.intersect ? backgroundColor! :  UIColor.random().withAlphaComponent(0.5)
-        canvas.fillColor = color.cgColor
+        inkColor = activeManipulationType == ManipulationType.intersect ? backgroundColor! :  UIColor.random().withAlphaComponent(0.5)
+        canvas.fillColor = inkColor.cgColor
         canvasCache.layer!.metalLayer!.addSublayer(canvas)
         
         if activeManipulationType == ManipulationType.intersect {

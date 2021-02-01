@@ -80,7 +80,7 @@ class VectorBrushModel: RenderingModel {
         
         if let bezierPath = generateBezierPolys(polygons)
         {
-            return DryStroke(vectorPath: bezierPath, color: color)
+            return DryStroke(vectorPath: bezierPath, color: inkColor)
         }
         
         return nil
@@ -103,13 +103,13 @@ class VectorBrushModel: RenderingModel {
     }
     
     override func drawingAddedPath(renderingContext: RenderingContext) {
-        drawStrokeResult = renderingContext.fillPolygon(addedPath ?? UIBezierPath(), color, blendMode: self.blendMode)
+        drawStrokeResult = renderingContext.fillPolygon(addedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
         predictedRect = renderingContext.measurePolygonBounds(polygon: predictedPath)
     }
     
     override func drawingPredictedPath(at: RenderingContext) {
         if preliminary == nil {
-            _ = at.fillPolygon(predictedPath ?? UIBezierPath(), color, blendMode: self.blendMode)
+            _ = at.fillPolygon(predictedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
         }
         else {
             _ = at.fillPolygon(predictedPath ?? UIBezierPath(), preliminary!, blendMode: self.blendMode)

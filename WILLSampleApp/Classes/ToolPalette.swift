@@ -623,6 +623,74 @@ class Crayon: RasterTool {
     }
 }
 
+class RasterEraser: RasterTool {
+    var particleSpacing: Float = 0.0
+    
+    func particleBrush(graphics: Graphics?) -> ParticleBrush {
+        let shapeView = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        shapeView.layer.cornerRadius = shapeView.frame.width / 2
+        shapeView.backgroundColor = .white
+        let shapeImage = shapeView.asImage()
+        
+        let fillTextureView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        fillTextureView.backgroundColor = .white
+        let fillImage = fillTextureView.asImage()
+        
+        let brush = ParticleBrush()
+        
+        brush.scattering = 0
+        brush.rotationMode = .none
+        brush.shapeTexture = graphics?.createTexture(by: shapeImage)
+        brush.fillTexture = graphics?.createTexture(by: fillImage)
+
+        return brush
+    }
+    
+    func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
+        if inputType == .direct {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 20
+                pathPoint.alpha = 255
+                pathPoint.rotation = 0
+                pathPoint.scaleX = 1
+                pathPoint.scaleY = 1
+                pathPoint.offsetX = 0
+                pathPoint.offsetY = 0
+                
+                return pathPoint
+            }
+        } else if inputType == .pencil {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 15
+                
+                pathPoint.alpha = 1
+                pathPoint.rotation = 0
+                
+                pathPoint.scaleX = 1
+                pathPoint.scaleY = 1
+                pathPoint.offsetX = 0
+                pathPoint.offsetY = 0
+                
+                return pathPoint
+            }
+        }
+        
+        return nil
+    }
+    
+    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+        if inputType == .direct {
+            return PathPointLayout([.x, .y, .size, .alpha])
+        } else if inputType == .pencil {
+            return PathPointLayout([.x, .y, .size, .alpha])
+        }
+        
+        return nil
+    }
+}
+
 class ToolPalette {
     static let shared = ToolPalette()
     
@@ -630,6 +698,7 @@ class ToolPalette {
     let pencil = Pencil()
     let waterBrush = WaterBrush()
     let crayon = Crayon()
+    let rasterEraser = RasterEraser()
     
     // Vector
     let pen = Pen()

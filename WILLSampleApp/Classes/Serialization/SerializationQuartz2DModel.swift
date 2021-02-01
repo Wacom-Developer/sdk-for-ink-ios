@@ -14,7 +14,7 @@ class SerializationQuartz2DModel {
     var backgroundColor = UIColor.white
     var selectedManipulationType: ManipulationType? = nil
     var selectedSpatialContextType: DemosSpatialContextType? = nil
-    var selectedTransformationType: TransformationType? = nil
+    var selectedManipulationAction: ManipulationAction? = nil
     var selectedManipulatorCollectionType: ManipulatorCollectionType? = nil
     private var recostructInkBilder: ManipulationVectorInkBuilder? = nil
     private var currentInkBuilder: ManipulationVectorInkBuilder? = nil
@@ -94,8 +94,8 @@ class SerializationQuartz2DModel {
         }
     }
     
-    func set(transformationType: TransformationType) {
-        selectedTransformationType = transformationType
+    func set(transformationType: ManipulationAction) {
+        selectedManipulationAction = transformationType
     }
     
     func set(manipulatorCollectionType: ManipulatorCollectionType) {
@@ -146,7 +146,7 @@ class SerializationQuartz2DModel {
     }
     
     func rotateBegan(_ sender: UIRotationGestureRecognizer) {
-        if selectedTransformationType == TransformationType.rotate {
+        if selectedManipulationAction == ManipulationAction.rotate {
             accumulateRotation = 0
             previousRotation = 0
             
@@ -155,13 +155,13 @@ class SerializationQuartz2DModel {
     }
     
     func rotateMoved(_ sender: UIRotationGestureRecognizer) {
-        if selectedTransformationType == TransformationType.rotate {
+        if selectedManipulationAction == ManipulationAction.rotate {
             updateRotatePerFrame(sender)
         }
     }
     
     func rotateEnded(_ sender: UIRotationGestureRecognizer) {
-        if selectedTransformationType == TransformationType.rotate {
+        if selectedManipulationAction == ManipulationAction.rotate {
             updateRotatePerFrame(sender)
             update(rotateAffineTransformByAngle(accumulateRotation), rotate: true)
         }
@@ -230,6 +230,16 @@ class SerializationQuartz2DModel {
         renderNewStroke(phase: .update, touches, event: event, view: view)
     }
     
+    func removeAll(view: UIView) {
+        applicationModel.strokes.removeAll()
+        
+        for sublayer in view.layer.sublayers! {
+            if sublayer is CAShapeLayer {
+                sublayer.removeFromSuperlayer()
+            }
+        }
+    }
+    
     func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?, view: UIView) {
         renderNewStroke(phase: .end, touches, event: event, view: view)
         
@@ -239,7 +249,7 @@ class SerializationQuartz2DModel {
             canvas.removeFromSuperlayer()
         } else {
             if(hasSelection) {
-                if selectedTransformationType == TransformationType.move {
+                if selectedManipulationAction == ManipulationAction.move {
                     update(CGAffineTransform(translationX: translateX!, y: translateY!))
                 }
             } else {
@@ -278,6 +288,14 @@ class SerializationQuartz2DModel {
     
     func save(_ url: URL) {
         applicationModel.write(to: url)
+    }
+    
+    func hasRasterInk(url: URL) -> Bool {
+        return applicationModel.hasRasterInk(url: url)
+    }
+    
+    func hasVectorInk(url: URL) -> Bool {
+        return applicationModel.hasVectorInk(url: url)
     }
     
     func load(url: URL, viewLayer: CALayer) {
@@ -394,7 +412,7 @@ class SerializationQuartz2DModel {
     private func renderNewStroke(phase: Phase, _ touches: Set<UITouch>, event: UIEvent?, view: UIView) {
         if selectedManipulationType == ManipulationType.select {
             if hasSelection {
-                if selectedTransformationType == TransformationType.move {
+                if selectedManipulationAction == ManipulationAction.move {
                     let location = touches.first!.location(in: view)
                     dx = location.x - previousX!
                     dy = location.y - previousY!

@@ -55,7 +55,7 @@ enum DemosSpatialContextType: Int, CustomStringConvertible {
     }
 }
 
-enum TransformationType: Int, CustomStringConvertible {
+enum ManipulationAction: Int, CustomStringConvertible {
     case move = 0
     case rotate
     

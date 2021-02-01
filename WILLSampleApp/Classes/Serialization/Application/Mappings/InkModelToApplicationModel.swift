@@ -8,6 +8,44 @@
 import WacomInk
 
 extension InkModel {
+    var hasRasterInk: Bool {
+        let enumerator = inkTree.root!.getRecursiveEnumerator()
+        
+        while let currentNode = enumerator.next() {
+            if (currentNode is StrokeNode) {
+                
+                let strokeNode = (currentNode as! StrokeNode)
+                               
+                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
+                    if brush is RasterBrush {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    var hasVectorInk: Bool {
+        let enumerator = inkTree.root!.getRecursiveEnumerator()
+        
+        while let currentNode = enumerator.next() {
+            if (currentNode is StrokeNode) {
+                
+                let strokeNode = (currentNode as! StrokeNode)
+                               
+                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
+                    if brush is VectorBrush {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
     var applicationModel: ApplicationModel {
         let resultAppModel = ApplicationModel(devices: self.inputConfiguration.devices.items, environments: self.inputConfiguration.environments.items, inkInputProviders: self.inputConfiguration.inkInputProviders.items, sensorContexts: self.inputConfiguration.sensorContexts.items, inputContexts: self.inputConfiguration.inputContexts.items) 
         
@@ -19,10 +57,9 @@ extension InkModel {
             if (currentNode is StrokeNode) {
                 
                 let strokeNode = (currentNode as! StrokeNode)
-               
+                               
                 if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
                     if brush is VectorBrush {
-                        
                         let inkStroke = deserializeStroke(vectorBrush: brush as! VectorBrush, stroke: strokeNode.stroke)
                         var touchType: UITouch.TouchType? = nil
                         var sensorDataId: Identifier? = nil
@@ -37,8 +74,6 @@ extension InkModel {
                                     }
                                 }
                             }
-                        } else if brush is RasterBrush {
-                            // return here and throw an error
                         }
                         
                         let applicationStroke = ApplicationStroke(inkStroke: inkStroke, touchType: touchType)

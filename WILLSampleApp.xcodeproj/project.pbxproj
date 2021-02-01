@@ -52,19 +52,6 @@
 		49E2481F2475957F0052E426 /* essential_fill_11.png in Resources */ = {isa = PBXBuildFile; fileRef = 49E2481E2475957F0052E426 /* essential_fill_11.png */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		490CC79A25014E51004D43E0 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		491687B7248E122A008716D1 /* SelectionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionModel.swift; sourceTree = "<group>"; };
 		491687BE248F81EA008716D1 /* SerializationQuartz2DModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationQuartz2DModel.swift; sourceTree = "<group>"; };
@@ -290,7 +277,6 @@
 				494D96B82427B0E0008C2FBC /* Sources */,
 				494D96B92427B0E0008C2FBC /* Frameworks */,
 				494D96BA2427B0E0008C2FBC /* Resources */,
-				490CC79A25014E51004D43E0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -542,7 +528,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = WILLSampleApp/WILLSampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HP936XN592;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -557,6 +543,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wacom.will3sample;
 				PRODUCT_NAME = "WILL 3 Sample";
 				SUPPORTS_MACCATALYST = NO;
@@ -571,7 +558,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = WILLSampleApp/WILLSampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HP936XN592;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -586,6 +573,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wacom.will3sample;
 				PRODUCT_NAME = "WILL 3 Sample";
 				SUPPORTS_MACCATALYST = NO;

@@ -27,13 +27,15 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     private var spatialContextSegmentedControl: UISegmentedControl!
     private var manipulationTypeLabel: UILabel!
     private var manipulationTypeSegmentedControl: UISegmentedControl!
-//    private var transformationTypeSegmentedControl: UISegmentedControl!
     private var manipulatorCollectionTypeSegmentedControl: UISegmentedControl!
     private var selectionButton: UIButton!
     private var rotateGestureRecognizer: UIRotationGestureRecognizer?
     private var selectionOverlapModeSegmentedControl: UISegmentedControl!
     private var saveModel: UIDocumentPickerSaveModel?
     private var fileName = "Test"
+    private var lastToolColor = UIColor.red
+    private var isDrawingStroke = false
+    private var queuedOperation: (() -> ())?
    
     //var isCached: Bool = false
     
@@ -42,7 +44,10 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     var wholeStrokeErasingFlag = false
     var isWholeStrokeOn = false
     var isLoad: Bool = false
+    var interactionEnabled = true
     
+    
+    @IBOutlet weak var toolSelectionButton: UIButton!
     @IBOutlet weak var transformationTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var penButton: UIButton!
     @IBOutlet weak var feltButton: UIButton!
@@ -52,6 +57,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBOutlet weak var partialStrokeSelectorButton: UIButton!
     @IBOutlet weak var wholeStrokeSelectorButton: UIButton!
     @IBOutlet weak var buttonsStackView: UIStackView!
+    @IBOutlet weak var selectInkButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,7 +133,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         
         serializationModel = SerializationQuartz2DModel(isCached: true)
         serializationModel?.selectPen(inputType: .direct)
-        serializationModel?.inkColor = .systemBlue
+        serializationModel?.inkColor = .red
         
         penButton.backgroundColor = .lightGray
         penButton.layer.cornerRadius = penButton.frame.width / 3
@@ -160,6 +166,17 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         
         saveModel = UIDocumentPickerSaveModel()
         
+        let customView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        customView.layer.cornerRadius = 15
+        customView.layer.masksToBounds = true
+        customView.backgroundColor = .red
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapColorPicker))
+        customView.addGestureRecognizer(tapGestureRecognizer)
+        
+        let barButtonItem = UIBarButtonItem(customView: customView)
+        self.navigationItem.rightBarButtonItem = barButtonItem
+        
 //        view.addSubview(spatialContextLabel)
 //        view.addSubview(spatialContextSegmentedControl)
 //        view.addSubview(manipulationTypeLabel)
@@ -185,7 +202,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @objc func rotatedView(_ sender: UIRotationGestureRecognizer) {
         if serializationModel!.selectedManipulationType == ManipulationType.select {
             
-            if serializationModel!.hasSelection && serializationModel!.selectedTransformationType == TransformationType.rotate {
+            if serializationModel!.hasSelection && serializationModel!.selectedManipulationAction == ManipulationAction.rotate {
                 if sender.state == .began {
                     serializationModel!.rotateBegan(sender)
                 } else if sender.state == .changed {
@@ -196,6 +213,219 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     //isRTreeLeavesShowHandler()
                     
                 }
+            }
+        }
+    }
+    
+    @objc func didTapRedColor() {
+        serializationModel?.inkColor = .red
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .red
+        lastToolColor = .red
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapBlueColor() {
+        serializationModel?.inkColor = .blue
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .blue
+        lastToolColor = .blue
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapYellowColor() {
+        serializationModel?.inkColor = .yellow
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .yellow
+        lastToolColor = .yellow
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapPurpleColor() {
+        serializationModel?.inkColor = .purple
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .purple
+        lastToolColor = .purple
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapGreenColor() {
+        serializationModel?.inkColor = .green
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .green
+        lastToolColor = .green
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapOrangeColor() {
+        serializationModel?.inkColor = .orange
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .orange
+        lastToolColor = .orange
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapBlackColor() {
+        serializationModel?.inkColor = .black
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .black
+        lastToolColor = .black
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapBrownColor() {
+        serializationModel?.inkColor = .brown
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .brown
+        lastToolColor = .brown
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapGrayColor() {
+        serializationModel?.inkColor = .gray
+        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .gray
+        lastToolColor = .gray
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func didTapColorPicker() {
+        let redColorView = UIView()
+        redColorView.backgroundColor = .red
+        redColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        redColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        redColorView.layer.cornerRadius = 25
+        let redGR = UITapGestureRecognizer(target: self, action: #selector(didTapRedColor))
+        redColorView.addGestureRecognizer(redGR)
+        
+        let blueColorView = UIView()
+        blueColorView.backgroundColor = .blue
+        blueColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        blueColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        blueColorView.layer.cornerRadius = 25
+        let blueGR = UITapGestureRecognizer(target: self, action: #selector(didTapBlueColor))
+        blueColorView.addGestureRecognizer(blueGR)
+    
+        let yellowColorView = UIView()
+        yellowColorView.backgroundColor = .yellow
+        yellowColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        yellowColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        yellowColorView.layer.cornerRadius = 25
+        let yellowGR = UITapGestureRecognizer(target: self, action: #selector(didTapYellowColor))
+        yellowColorView.addGestureRecognizer(yellowGR)
+        
+        let purpleColorView = UIView()
+        purpleColorView.backgroundColor = .purple
+        purpleColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        purpleColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        purpleColorView.layer.cornerRadius = 25
+        let purpleGR = UITapGestureRecognizer(target: self, action: #selector(didTapPurpleColor))
+        purpleColorView.addGestureRecognizer(purpleGR)
+        
+        let greenColorView = UIView()
+        greenColorView.backgroundColor = .green
+        greenColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        greenColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        greenColorView.layer.cornerRadius = 25
+        let greenGR = UITapGestureRecognizer(target: self, action: #selector(didTapGreenColor))
+        greenColorView.addGestureRecognizer(greenGR)
+        
+        let orangeColorView = UIView()
+        orangeColorView.backgroundColor = .orange
+        orangeColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        orangeColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        orangeColorView.layer.cornerRadius = 25
+        let orangeGR = UITapGestureRecognizer(target: self, action: #selector(didTapOrangeColor))
+        orangeColorView.addGestureRecognizer(orangeGR)
+        
+        let blackColorView = UIView()
+        blackColorView.backgroundColor = .black
+        blackColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        blackColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        blackColorView.layer.cornerRadius = 25
+        let blackGR = UITapGestureRecognizer(target: self, action: #selector(didTapBlackColor))
+        blackColorView.addGestureRecognizer(blackGR)
+        
+        let brownColorView = UIView()
+        brownColorView.backgroundColor = .brown
+        brownColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        brownColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        brownColorView.layer.cornerRadius = 25
+        let brownGR = UITapGestureRecognizer(target: self, action: #selector(didTapBrownColor))
+        brownColorView.addGestureRecognizer(brownGR)
+        
+        let grayColorView = UIView()
+        grayColorView.backgroundColor = .gray
+        grayColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        grayColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        grayColorView.layer.cornerRadius = 25
+        let grayGR = UITapGestureRecognizer(target: self, action: #selector(didTapGrayColor))
+        grayColorView.addGestureRecognizer(grayGR)
+
+        let popover = UIAlertController(title: "\n\n\n\n\n\n\n\n\n\n\n\n\n", message: nil, preferredStyle: .actionSheet)
+        popover.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
+        
+        let mainStackView = UIStackView()
+        mainStackView.axis = NSLayoutConstraint.Axis.vertical
+        mainStackView.distribution = UIStackView.Distribution.fillProportionally
+        mainStackView.alignment = UIStackView.Alignment.center
+        mainStackView.spacing = 3
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let topStackView = UIStackView()
+        topStackView.axis = NSLayoutConstraint.Axis.horizontal
+        topStackView.distribution = UIStackView.Distribution.equalSpacing
+        topStackView.alignment = UIStackView.Alignment.center
+        topStackView.spacing = 10
+
+        topStackView.addArrangedSubview(redColorView)
+        topStackView.addArrangedSubview(blueColorView)
+        topStackView.addArrangedSubview(yellowColorView)
+        topStackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let midStackView = UIStackView()
+        midStackView.axis = NSLayoutConstraint.Axis.horizontal
+        midStackView.distribution = UIStackView.Distribution.equalSpacing
+        midStackView.alignment = UIStackView.Alignment.center
+        midStackView.spacing = 10
+
+        midStackView.addArrangedSubview(purpleColorView)
+        midStackView.addArrangedSubview(greenColorView)
+        midStackView.addArrangedSubview(orangeColorView)
+        midStackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let bottomStackView = UIStackView()
+        bottomStackView.axis = NSLayoutConstraint.Axis.horizontal
+        bottomStackView.distribution = UIStackView.Distribution.equalSpacing
+        bottomStackView.alignment = UIStackView.Alignment.center
+        bottomStackView.spacing = 10
+
+        bottomStackView.addArrangedSubview(blackColorView)
+        bottomStackView.addArrangedSubview(brownColorView)
+        bottomStackView.addArrangedSubview(grayColorView)
+        bottomStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        mainStackView.addArrangedSubview(topStackView)
+        mainStackView.addArrangedSubview(midStackView)
+        mainStackView.addArrangedSubview(bottomStackView)
+                
+        let leadingConstraint = NSLayoutConstraint(item: mainStackView, attribute: .leading, relatedBy: .equal, toItem: popover.view, attribute: .leading, multiplier: 1, constant: 0)
+        let trailingConstraint = NSLayoutConstraint(item: mainStackView, attribute: .trailing, relatedBy: .equal, toItem: popover.view, attribute: .trailing, multiplier: 1, constant: 0)
+        let topConstraint = NSLayoutConstraint(item: mainStackView, attribute: .top, relatedBy: .equal, toItem: popover.view, attribute: .top, multiplier: 1, constant: 0)
+        let bottomConstraint = NSLayoutConstraint(item: mainStackView, attribute: .bottom, relatedBy: .equal, toItem: popover.view, attribute: .bottom, multiplier: 1, constant: 0)
+        
+        popover.view.addSubview(mainStackView)
+        
+        popover.view.addConstraints([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+        
+        present(popover, animated: true, completion: nil)
+    }
+    
+    @IBAction func didTapResetAll(_ sender: UIButton) {
+        serializationModel?.removeAll(view: view)
+    }
+    
+    @IBAction func didTapSelect(_ sender: UIButton) {
+        if isSelectingInk {
+            if serializationModel!.onSelectButton(view: view) {
+                setSelectionButton()
+            } else {
+                let alertController = UIAlertController(title: "Insufficient data", message:
+                                                            "You need to draw selecting area.", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: .default))
+                
+                self.present(alertController, animated: true, completion: nil)
             }
         }
     }
@@ -214,36 +444,36 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        serializationModel!.touchesBegan(touches, with: event, view: view)
-        buttonsStackView.isUserInteractionEnabled = false
+        if interactionEnabled {
+            isDrawingStroke = true
+            serializationModel!.touchesBegan(touches, with: event, view: view)
+            buttonsStackView.isUserInteractionEnabled = false
+        }
     }
     
     override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if touches.first!.force != 0.3333333333333333 {
-            serializationModel!.touchesMoved(touches, with: event, view: view)
+        if interactionEnabled {
+            if touches.first!.force != 0.3333333333333333 {
+                serializationModel!.touchesMoved(touches, with: event, view: view)
+            }
         }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        isDrawingStroke = false
         buttonsStackView.isUserInteractionEnabled = true
     }
     
     override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        buttonsStackView.isUserInteractionEnabled = true
-        serializationModel!.touchesEnded(touches, with: event, view: view)
-        //isRTreeLeavesShowHandler()
-
-        if isSelectingInk {
-            if serializationModel!.onSelectButton(view: view) {
-                setSelectionButton()
-            } else {
-                let alertController = UIAlertController(title: "Insufficient data", message:
-                    "You need to draw selecting area.", preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: "OK", style: .default))
-
-                self.present(alertController, animated: true, completion: nil)
-            }
+        enableToolsButtons()
+        if interactionEnabled {
+            isDrawingStroke = false
+            buttonsStackView.isUserInteractionEnabled = true
+            serializationModel!.touchesEnded(touches, with: event, view: view)
         }
+        
+        queuedOperation?()
+        queuedOperation = nil
     }
     
     @IBAction func didTapDismiss(_ sender: UIBarButtonItem) {
@@ -277,11 +507,23 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapPenButton(_ sender: UIButton) {
-        serializationModel?.set(manipulationType: .draw)
-        serializationModel?.selectPen(inputType: .direct)
-        serializationModel?.inkColor = .systemBlue
-        isSelectingInk = false
-        ToolPalette.shared.selectedVectorTool = ToolPalette.shared.pen
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.selectPen(inputType: .direct)
+                self.selectInkButton.isHidden = true
+                self.transformationTypeSegmentedControl.isHidden = true
+                self.serializationModel?.set(manipulationType: .draw)
+                self.isSelectingInk = false
+                self.serializationModel?.inkColor = self.lastToolColor
+            }
+        } else {
+            selectInkButton.isHidden = true
+            transformationTypeSegmentedControl.isHidden = true
+            serializationModel?.set(manipulationType: .draw)
+            isSelectingInk = false
+            serializationModel?.inkColor = lastToolColor
+            serializationModel?.selectPen(inputType: .direct)
+        }
         
         penButton.backgroundColor = .lightGray
         penButton.layer.cornerRadius = penButton.frame.width / 3
@@ -300,12 +542,20 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapFeltButton(_ sender: UIButton) {
-        serializationModel?.set(manipulationType: .draw)
-        serializationModel?.selectFelt(inputType: .direct)
-        serializationModel?.inkColor = .systemTeal
-        isSelectingInk = false
-        ToolPalette.shared.selectedVectorTool = ToolPalette.shared.felt
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.selectFelt(inputType: .direct)
+            }
+        } else {
+            serializationModel?.selectFelt(inputType: .direct)
+        }
         
+        selectInkButton.isHidden = true
+        transformationTypeSegmentedControl.isHidden = true
+        serializationModel?.set(manipulationType: .draw)
+        isSelectingInk = false
+        serializationModel?.inkColor = lastToolColor
+
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
         feltButton.backgroundColor = .lightGray
@@ -323,11 +573,19 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapBrushButton(_ sender: UIButton) {
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.selectBrush(inputType: .direct)
+            }
+        } else {
+            serializationModel?.selectBrush(inputType: .direct)
+        }
+        
+        selectInkButton.isHidden = true
+        transformationTypeSegmentedControl.isHidden = true
         serializationModel?.set(manipulationType: .draw)
-        serializationModel?.selectBrush(inputType: .direct)
-        serializationModel?.inkColor = UIColor.systemRed.withAlphaComponent(0.6)
         isSelectingInk = false
-        ToolPalette.shared.selectedVectorTool = ToolPalette.shared.brush
+        serializationModel?.inkColor = lastToolColor
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -346,15 +604,35 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapPartialStrokeEraser(_ sender: UIButton) {
-        serializationModel!.set(manipulationType: .intersect)
-        serializationModel?.inkColor = .white
-        
-        if isWholeStrokeOn {
-            serializationModel?.toggleWholeStroke()
-            isWholeStrokeOn = false
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel!.set(manipulationType: .intersect)
+                self.serializationModel?.inkColor = .white
+                
+                if self.isWholeStrokeOn {
+                    self.serializationModel?.toggleWholeStroke()
+                    self.isWholeStrokeOn = false
+                }
+                
+                self.selectInkButton.isHidden = true
+                self.transformationTypeSegmentedControl.isHidden = true
+                
+                self.isSelectingInk = false
+            }
+        } else {
+            serializationModel!.set(manipulationType: .intersect)
+            serializationModel?.inkColor = .white
+            
+            if isWholeStrokeOn {
+                serializationModel?.toggleWholeStroke()
+                isWholeStrokeOn = false
+            }
+            
+            selectInkButton.isHidden = true
+            transformationTypeSegmentedControl.isHidden = true
+            
+            isSelectingInk = false
         }
-        
-        isSelectingInk = false
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -373,15 +651,35 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapWholeStrokeEraser(_ sender: UIButton) {
-        serializationModel?.set(manipulationType: .intersect)
-        serializationModel?.inkColor = .white
-        
-        if !isWholeStrokeOn {
-            serializationModel?.toggleWholeStroke()
-            isWholeStrokeOn = true
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.set(manipulationType: .intersect)
+                self.serializationModel?.inkColor = .white
+                
+                if !self.isWholeStrokeOn {
+                    self.serializationModel?.toggleWholeStroke()
+                    self.isWholeStrokeOn = true
+                }
+                
+                self.selectInkButton.isHidden = true
+                self.transformationTypeSegmentedControl.isHidden = true
+                
+                self.isSelectingInk = false
+            }
+        } else {
+            serializationModel?.set(manipulationType: .intersect)
+            serializationModel?.inkColor = .white
+            
+            if !isWholeStrokeOn {
+                serializationModel?.toggleWholeStroke()
+                isWholeStrokeOn = true
+            }
+            
+            selectInkButton.isHidden = true
+            transformationTypeSegmentedControl.isHidden = true
+            
+            isSelectingInk = false
         }
-        
-        isSelectingInk = false
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -400,14 +698,31 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapPartialStrokeSelector(_ sender: UIButton) {
-        serializationModel?.set(manipulationType: .select)
-        
-        if isWholeStrokeOn {
-            serializationModel?.toggleWholeStroke()
-            isWholeStrokeOn = false
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.set(manipulationType: .select)
+                self.selectInkButton.isHidden = false
+                self.selectInkButton.setTitle("Select", for: .normal)
+                
+                if self.isWholeStrokeOn {
+                    self.serializationModel?.toggleWholeStroke()
+                    self.isWholeStrokeOn = false
+                }
+                
+                self.isSelectingInk = true
+            }
+        } else {
+            serializationModel?.set(manipulationType: .select)
+            selectInkButton.isHidden = false
+            selectInkButton.setTitle("Select", for: .normal)
+            
+            if isWholeStrokeOn {
+                serializationModel?.toggleWholeStroke()
+                isWholeStrokeOn = false
+            }
+            
+            isSelectingInk = true
         }
-        
-        isSelectingInk = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -426,14 +741,31 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapWholeStrokeSelector(_ sender: UIButton) {
-        serializationModel?.set(manipulationType: .select)
-        
-        if !isWholeStrokeOn {
-            serializationModel?.toggleWholeStroke()
-            isWholeStrokeOn = true
+        if isDrawingStroke {
+            queuedOperation = {
+                self.serializationModel?.set(manipulationType: .select)
+                self.selectInkButton.isHidden = false
+                self.selectInkButton.setTitle("Select", for: .normal)
+                
+                if !self.isWholeStrokeOn {
+                    self.serializationModel?.toggleWholeStroke()
+                    self.isWholeStrokeOn = true
+                }
+                
+                self.isSelectingInk = true
+            }
+        } else {
+            serializationModel?.set(manipulationType: .select)
+            selectInkButton.isHidden = false
+            selectInkButton.setTitle("Select", for: .normal)
+            
+            if !isWholeStrokeOn {
+                serializationModel?.toggleWholeStroke()
+                isWholeStrokeOn = true
+            }
+            
+            isSelectingInk = true
         }
-        
-        isSelectingInk = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -463,14 +795,45 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
             // Make sure you release the security-scoped resource when you are done.
             defer { url.stopAccessingSecurityScopedResource() }
             
-            serializationModel!.load(url: url, viewLayer: view.layer)
-            isRTreeLeavesShowHandler()
+            if url.pathExtension == "uim" {
+                if serializationModel?.hasRasterInk(url: url) ?? false {
+                    let alertController = UIAlertController(title: "Raster ink in vector canvas", message: "The ink model you are trying to load contains raster ink. Ink manipulation is disabled.", preferredStyle: .alert)
+                    let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                    alertController.addAction(alertAction)
+                    toolSelectionButton.isEnabled = false
+                    serializationModel!.load(url: url, viewLayer: view.layer)
+                    isRTreeLeavesShowHandler()
+                    interactionEnabled = false
+                    
+                    if isSelectingTool {
+                        UIView.animate(withDuration: 0.3) {
+                            self.penButton.alpha = 0
+                            self.feltButton.alpha = 0
+                            self.brushButton.alpha = 0
+                            self.partialStrokeEraserButton.alpha = 0
+                            self.wholeStrokeEraserButton.alpha = 0
+                            self.partialStrokeSelectorButton.alpha = 0
+                            self.wholeStrokeSelectorButton.alpha = 0
+                        }
+                    }
+                    
+                    present(alertController, animated: true, completion: nil)
+                } else {
+                    serializationModel!.load(url: url, viewLayer: view.layer)
+                    isRTreeLeavesShowHandler()
+                    toolSelectionButton.isEnabled = true
+                    interactionEnabled = true
+                }
+            } else {
+                let alertView = UIAlertController(title: "Wrong file extension", message: "The selected file is not a .uim file", preferredStyle: .alert)
+                let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                alertView.addAction(alertAction)
+                present(alertView, animated: true, completion: nil)
+            }
         } else {
             saveModel!.selectedFolderURL = url
            
             //let result = saveModel!.validate()
-            
-            print("saveModel!.validateMessage -> \(saveModel!.validateMessage)")
             
             let alertController = UIAlertController(title: "Name", message: "Choose a name", preferredStyle: .alert)
             
@@ -581,17 +944,39 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         clickSelectionButtonHandler()
     }
     
+    private func disableToolsButtons() {
+        toolSelectionButton.isEnabled = false
+        penButton.isEnabled = false
+        feltButton.isEnabled = false
+        brushButton.isEnabled = false
+        partialStrokeEraserButton.isEnabled = false
+        wholeStrokeEraserButton.isEnabled = false
+        partialStrokeSelectorButton.isEnabled = false
+        wholeStrokeSelectorButton.isEnabled = false
+    }
+    
+    private func enableToolsButtons() {
+        toolSelectionButton.isEnabled = true
+        penButton.isEnabled = true
+        feltButton.isEnabled = true
+        brushButton.isEnabled = true
+        partialStrokeEraserButton.isEnabled = true
+        wholeStrokeEraserButton.isEnabled = true
+        partialStrokeSelectorButton.isEnabled = true
+        wholeStrokeSelectorButton.isEnabled = true
+    }
+    
     private func setSelectionButton() {
         if serializationModel!.hasSelection {
-            selectionButton.setTitle("Clear", for: .normal)
-            selectionButton!.backgroundColor = UIColor(red: 0.9, green: 0.1, blue: 0.2, alpha: 0.9)
             transformationTypeSegmentedControl.isHidden = false
+            selectInkButton.isHidden = false
+            selectInkButton.setTitle("Deselect", for: .normal)
+            
             view.addGestureRecognizer(rotateGestureRecognizer!)
             isRTreeLeavesShowHandler()
         }
         else {
-            selectionButton.setTitle("Select", for: .normal)
-            selectionButton!.backgroundColor = UIColor(red: 0.1, green: 0.9, blue: 0.2, alpha: 0.9)
+            selectInkButton.setTitle("Select", for: .normal)
             transformationTypeSegmentedControl.isHidden = true
             
             view.removeGestureRecognizer(rotateGestureRecognizer!)
@@ -662,7 +1047,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     private func selectTransformationHandler() {
-        serializationModel!.set(transformationType: TransformationType(rawValue: transformationTypeSegmentedControl!.selectedSegmentIndex)!)
+        serializationModel!.set(transformationType: ManipulationAction(rawValue: transformationTypeSegmentedControl!.selectedSegmentIndex)!)
     }
     
     public func isRTreeLeavesShowHandler() {
