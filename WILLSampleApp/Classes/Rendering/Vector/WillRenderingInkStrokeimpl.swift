@@ -13,7 +13,7 @@ class WillRendering {
         func createStroke(_ newSpline: Spline, _ originalStroke: InkStrokeProtocol, inkStrokeId: Identifier?, firstPointIndex: UInt32, pointsCount: UInt32) -> InkStrokeProtocol {
             let identifier = inkStrokeId ?? Identifier.fromNewUUID()
             let resultStroke = InkStroke(
-                identifier: identifier,
+                identifier: identifier!,
                 spline: newSpline,
                 layout: originalStroke.layout,
                 vectorBrush: originalStroke.vectorBrush,

@@ -35,7 +35,7 @@ protocol RenderingProtocol {
     var addedRect: CGRect? { get }
     
     func initPath()
-    func drawingAddedPath(renderingContext: RenderingContext)
+    func drawingAddedPath(renderingContext: RenderingContext) throws
     func drawingPredictedPath(at: RenderingContext)
     func touchesBeganBody()
     func touchesEndedBody()
@@ -60,7 +60,7 @@ class RenderingModel: RenderingProtocol {
         assertionFailure("[ERROR] initPath() must be overridden by all subclasses of RenderingModel!")
     }
     
-    func drawingAddedPath(renderingContext: RenderingContext) {
+    func drawingAddedPath(renderingContext: RenderingContext) throws {
         assertionFailure("[ERROR] drawingAddedPath(renderingContext: RenderingContext) must be overridden by all subclasses of RenderingModel!")
     }
     
@@ -140,11 +140,15 @@ class RenderingController: UIViewController {
     
     func prepareLayersForDrawing()
     {
-        renderingContext?.setTarget(sceneLayer)
-        renderingContext?.clearColor(backgroundColor)
-        
-        renderingContext?.setTarget(allStrokesLayer)
-        renderingContext?.clearColor(UIColor.clear)
+        do {
+            renderingContext?.setTarget(sceneLayer)
+            try renderingContext?.clearColor(backgroundColor)
+            
+            renderingContext?.setTarget(allStrokesLayer)
+            try renderingContext?.clearColor(UIColor.clear)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         prepareLayersForDrawingBody()
     }
@@ -195,20 +199,25 @@ class RenderingController: UIViewController {
     func renderNewStroke() {
         renderingContext?.setTarget(currentStrokeLayer)
         renderingModel!.initPath()
-        renderingModel!.drawingAddedPath(renderingContext: renderingContext!)
+        try! renderingModel!.drawingAddedPath(renderingContext: renderingContext!)
         
         let updateRect: CGRect = dirtyRectManager!.getUpdateRect(addedStrokeRect: renderingModel!.addedRect , predictedStrokeRect: renderingModel!.predictedRect)
         
         renderingContext?.setTarget(preliminaryLayer, updateRect)
-        renderingContext!.drawLayerAtPoint(currentStrokeLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.none)
         
-        renderingModel!.drawingPredictedPath(at: renderingContext!)
-        renderingContext?.setTarget(sceneLayer, updateRect)
-        renderingContext?.clearColor(backgroundColor)
-        renderingContext?.drawLayerAtPoint(allStrokesLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.normal)
-        renderingContext!.drawLayerAtPoint(preliminaryLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.normal)
-        renderingContext?.setTarget(backbufferLayer)
-        renderingContext!.drawLayer(sceneLayer, nil, blendMode: BlendMode.none)
+        do {
+            try renderingContext!.drawLayerAtPoint(currentStrokeLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.none)
+            
+            renderingModel!.drawingPredictedPath(at: renderingContext!)
+            renderingContext?.setTarget(sceneLayer, updateRect)
+            try renderingContext?.clearColor(backgroundColor)
+            try renderingContext?.drawLayerAtPoint(allStrokesLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.normal)
+            try renderingContext!.drawLayerAtPoint(preliminaryLayer, sourceRect: updateRect, destinationLocation: CGPoint(x: updateRect.minX, y: updateRect.minY), blendMode: BlendMode.normal)
+            renderingContext?.setTarget(backbufferLayer)
+            try renderingContext!.drawLayer(sceneLayer, nil, blendMode: BlendMode.none)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
     func storeCurrentStrokeBody() {}
@@ -217,30 +226,38 @@ class RenderingController: UIViewController {
         storeCurrentStrokeBody()
         
         renderingContext?.setTarget(allStrokesLayer)
-        renderingContext!.drawLayer (currentStrokeLayer, nil, blendMode: BlendMode.normal)
-        
-        renderingContext?.setTarget(currentStrokeLayer)
-        renderingContext?.clearColor(UIColor.clear)
+        do {
+            try renderingContext!.drawLayer (currentStrokeLayer, nil, blendMode: BlendMode.normal)
+            
+            renderingContext?.setTarget(currentStrokeLayer)
+            try renderingContext?.clearColor(UIColor.clear)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         dirtyRectManager!.reset()
         mustPresent = true
     }
     
     func clearLayers() {
-        renderingContext?.setTarget(backbufferLayer)
-        renderingContext?.clearColor(backgroundColor)
-        
-        renderingContext?.setTarget(sceneLayer)
-        renderingContext?.clearColor(backgroundColor)
-        
-        renderingContext?.setTarget(allStrokesLayer)
-        renderingContext?.clearColor(UIColor.clear)
-        
-        renderingContext?.setTarget(preliminaryLayer)
-        renderingContext?.clearColor(UIColor.clear)
-        
-        renderingContext?.setTarget(currentStrokeLayer)
-        renderingContext?.clearColor(UIColor.clear)
+        do {
+            renderingContext?.setTarget(backbufferLayer)
+            try renderingContext?.clearColor(backgroundColor)
+            
+            renderingContext?.setTarget(sceneLayer)
+            try renderingContext?.clearColor(backgroundColor)
+            
+            renderingContext?.setTarget(allStrokesLayer)
+            try renderingContext?.clearColor(UIColor.clear)
+            
+            renderingContext?.setTarget(preliminaryLayer)
+            try renderingContext?.clearColor(UIColor.clear)
+            
+            renderingContext?.setTarget(currentStrokeLayer)
+            try renderingContext?.clearColor(UIColor.clear)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
     func createLayers() {

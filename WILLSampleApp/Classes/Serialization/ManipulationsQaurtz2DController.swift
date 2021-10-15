@@ -36,6 +36,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     private var lastToolColor = UIColor.red
     private var isDrawingStroke = false
     private var queuedOperation: (() -> ())?
+    private var fileExtension = ""
    
     //var isCached: Bool = false
     
@@ -801,7 +802,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                     alertController.addAction(alertAction)
                     toolSelectionButton.isEnabled = false
-                    serializationModel!.load(url: url, viewLayer: view.layer)
+                    try! serializationModel!.load(url: url, viewLayer: view.layer)
                     isRTreeLeavesShowHandler()
                     interactionEnabled = false
                     
@@ -819,7 +820,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     
                     present(alertController, animated: true, completion: nil)
                 } else {
-                    serializationModel!.load(url: url, viewLayer: view.layer)
+                    try! serializationModel!.load(url: url, viewLayer: view.layer)
                     isRTreeLeavesShowHandler()
                     toolSelectionButton.isEnabled = true
                     interactionEnabled = true
@@ -850,25 +851,36 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                 self.saveModel!.selectedFileName = self.fileName
                 
                 if self.saveModel!.isValid {
-                    var urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!).uim")
+                    var urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!).\(self.fileExtension)")
                     if urlToSave.checkFileExist() {
                         let date = Date()
                         let format = DateFormatter()
                         format.dateFormat = "yyyy-MM-dd HH:mm:ss"
                         let formattedDate = format.string(from: date)
-                        urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!)_\(formattedDate).uim")
+                        urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!)_\(formattedDate).\(self.fileExtension)")
                     }
                     
                     guard self.saveModel!.selectedFolderURL!.startAccessingSecurityScopedResource() else {
-                        // Handle the failure here.
                         assert(false, "Could not access security scoped context")
                         return
                     }
                     
                     defer { self.saveModel!.selectedFolderURL!.stopAccessingSecurityScopedResource() }
                     
-                    self.serializationModel!.save(urlToSave)//, name: saveNameFile)
-                    print("Saved successfully in \(urlToSave.path)")
+                    do {
+                        switch self.fileExtension {
+                        case "uim":
+                            try self.serializationModel!.save(urlToSave)//, name: saveNameFile)
+                            print("Saved successfully in \(urlToSave.path)")
+                        case "pdf":
+                            try self.serializationModel?.savePDF(urlToSave)
+                            print("Saved successfully in \(urlToSave.path)")
+                        default:
+                            print("unknown file extension")
+                        }
+                    } catch let error {
+                        print("ERROR: \(error)")
+                    }
                 } else {
                     print("saveModel!.validateMessage -> \(self.saveModel!.validateMessage)")
                 }
@@ -885,7 +897,19 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         }
     }
     
+    @IBAction func didTapSaveAsPDF(_ sender: UIButton) {
+        fileExtension = "pdf"
+        let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+        
+        isLoad = false
+        documentPicker.delegate = self
+        
+        present(documentPicker, animated: true, completion: nil)
+    }
+    
     @IBAction func didTapSave(_ sender: UIButton) {
+        fileExtension = "uim"
+        
         let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
         
         isLoad = false

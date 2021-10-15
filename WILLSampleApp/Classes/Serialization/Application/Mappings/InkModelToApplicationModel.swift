@@ -16,7 +16,7 @@ extension InkModel {
                 
                 let strokeNode = (currentNode as! StrokeNode)
                                
-                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
+                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri!) {
                     if brush is RasterBrush {
                         return true
                     }
@@ -35,7 +35,7 @@ extension InkModel {
                 
                 let strokeNode = (currentNode as! StrokeNode)
                                
-                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
+                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri!) {
                     if brush is VectorBrush {
                         return true
                     }
@@ -58,27 +58,35 @@ extension InkModel {
                 
                 let strokeNode = (currentNode as! StrokeNode)
                                
-                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri) {
+                if let brush = brushes.tryGetBrush(brushName: strokeNode.stroke.style.brushUri!) {
                     if brush is VectorBrush {
-                        let inkStroke = deserializeStroke(vectorBrush: brush as! VectorBrush, stroke: strokeNode.stroke)
-                        var touchType: UITouch.TouchType? = nil
-                        var sensorDataId: Identifier? = nil
-                        if let sensorDataToAdd = sensorDataRepository.TryGetValue(id: strokeNode.stroke.sensorDataId) {
-                            sensorDataId = strokeNode.stroke.sensorDataId
-                            resultAppModel.sensorDataMaps[sensorDataId!] = sensorDataToAdd // Fix to  be reviewed
+                        do {
+                            let inkStroke = try deserializeStroke(vectorBrush: brush as! VectorBrush, stroke: strokeNode.stroke)
+                            var touchType: UITouch.TouchType? = nil
+                            var sensorDataId: Identifier? = nil
                             
-                            if let inputContext = inputConfiguration.inputContexts.find(indetifierString: sensorDataToAdd.inputContextID.toString()) {
-                                if let sensorContex = inputConfiguration.sensorContexts.find(indetifierString: inputContext.sensorContextId.toString()) {
-                                    if let inkProvider = sensorContex.defaultSensorChannelsContext!.inkInputProvider {
-                                        touchType = ApplicationModel.getTouchType(by: inkProvider)
+                            if let id = strokeNode.stroke.sensorDataId {
+                                if let sensorDataToAdd = sensorDataRepository.TryGetValue(id: id) {
+                                    sensorDataId = strokeNode.stroke.sensorDataId
+                                    resultAppModel.sensorDataMaps[sensorDataId!] = sensorDataToAdd // Fix to  be reviewed
+                                    
+                                    if let inputContext = inputConfiguration.inputContexts.find(identifierStr: sensorDataToAdd.inputContextID.toString()) {
+                                        if let sensorContext = inputConfiguration.sensorContexts.find(identifierStr: inputContext.sensorContextId.toString()) {
+                                            if let inkProvider = sensorContext.defaultSensorChannelsContext!.inkInputProvider {
+                                                touchType = ApplicationModel.getTouchType(by: inkProvider)
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            
+                            
+                            let applicationStroke = ApplicationStroke(inkStroke: inkStroke, touchType: touchType)
+                            applicationStroke.sensorDataId = sensorDataId
+                            resultAppModel.strokes.append(key: inkStroke.id, value: applicationStroke)
+                        } catch let error {
+                            print("ERROR: \(error)")
                         }
-                        
-                        let applicationStroke = ApplicationStroke(inkStroke: inkStroke, touchType: touchType)
-                        applicationStroke.sensorDataId = sensorDataId
-                        resultAppModel.strokes.append(key: inkStroke.id, value: applicationStroke)
                     }
                 }
                 processedStrokes = processedStrokes + 1
@@ -88,105 +96,87 @@ extension InkModel {
         return resultAppModel
     }
     
-    private func deserializeStroke(vectorBrush: VectorBrush, stroke: Stroke) -> Quartz2D.InkStroke {
-        var brushPolygons = [BrushPolygon]()
-        
-        if vectorBrush.brushPolygons?.count ?? 0 > 0 {
-            brushPolygons = vectorBrush.brushPolygons!
-        } else if vectorBrush.brushPrototypeURIs.count > 0 {
-            for prototype in vectorBrush.brushPrototypeURIs {
-                let uri = prototype.shapeUri
-                let minScale = prototype.minScale
-                //stroke.style.pathPointProperties.size
-                if uri != "" {
-                    var precision = 20
-                    var radius: Float = 1.0
-                    
-                    let lastPart = uri.split(separator: "/").last
-                    let shape = lastPart?.split(separator: "?").first
-                    
-                    if shape == "Circle" {
-                        if lastPart?.split(separator: "?").count ?? 0 > 1 { // check if there's any parameters at all
-                            if let parameters = lastPart?.split(separator: "?").last?.split(separator: "&") {
-                                for param in parameters {
-                                    let parts = param.split(separator: "=")
-                                    let paramName = parts.first
-                                    let paramValue = parts.last
-                                    
-                                    if paramName == "precision" {
-                                        precision = Int(String(paramValue ?? "")) ?? 20
-                                    } else if paramName == "radius" {
-                                        radius = Float(String(paramValue ?? "")) ?? 1.0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    let points = VectorBrushFactory.createElipseBrush(pointsCount: precision, width: radius, height: radius)
-                    
-                    brushPolygons.append(BrushPolygon(minScale: minScale, points: points))
+    private func deserializeStroke(vectorBrush: VectorBrush, stroke: Stroke) throws -> Quartz2D.InkStroke {
+        var geometryVectorBrush: Geometry.VectorBrush?
+        if vectorBrush.brushPolygons != nil && vectorBrush.brushPolygons!.count > 0 {
+            geometryVectorBrush = try Geometry.VectorBrush(polygons:
+                vectorBrush.brushPolygons!.map {
+                    try BrushPolygon.createNormalized(minScale: $0.minScale, points: $0.points.map { DIFloat2($0.x, $0.y)})
                 }
+            )
+        } else {
+            if vectorBrush.brushPrototypeURIs.count > 0 {
+                var polygons = [BrushPolygon]()
+                
+                for uri in vectorBrush.brushPrototypeURIs {
+                    polygons.append(try URIShapeResolver.resolveShape(uri: uri))
+                }
+                
+                geometryVectorBrush = try Geometry.VectorBrush(polygons: polygons)
+            } else {
+                geometryVectorBrush = try Geometry.VectorBrush(polygons: [BrushPolygon.createNormalized(minScale: 1.0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4, center: DIPoint2(0, 0)))])
             }
         }
         
         let constants = Quartz2D.ConstantAttributes()
-        let ppp = stroke.style.pathPointProperties
-        if ppp.size != nil {
-            constants.size = ppp.size!
-            //(returnInkStroke.constants as! Quartz2D.ConstantAttributes).size = ppp.size!
+        if let ppp = stroke.style.pathPointProperties {
+            if ppp.size != nil {
+                constants.size = ppp.size!
+            }
+            
+            if ppp.rotation != nil {
+                constants.rotation = ppp.rotation!
+            }
+            
+            if ppp.scaleX != nil {
+                constants.scaleX = ppp.scaleX!
+            }
+            
+            if ppp.scaleY != nil {
+                constants.scaleY = ppp.scaleY!
+            }
+            
+            if ppp.scaleZ != nil {
+                constants.scaleZ = ppp.scaleZ!
+            }
+            
+            if ppp.offsetX != nil {
+                constants.offsetX = ppp.offsetX!
+            }
+            
+            if ppp.offsetY != nil {
+                constants.offsetY = ppp.offsetY!
+            }
+            
+            if ppp.offsetZ != nil {
+                constants.offsetZ = ppp.offsetZ!
+            }
+            
+            if ppp.red != nil {
+                constants.red = ppp.red!
+            }
+            
+            if ppp.green != nil {
+                constants.green = ppp.green!
+            }
+            
+            if ppp.blue != nil {
+                constants.blue = ppp.blue!
+            }
+            
+            if ppp.alpha != nil {
+                constants.alpha = ppp.alpha!
+            }
         }
-
-        if ppp.rotation != nil {
-            constants.rotation = ppp.rotation!
-        }
-
-        if ppp.scaleX != nil {
-            constants.scaleX = ppp.scaleX!
-        }
-
-        if ppp.scaleY != nil {
-            constants.scaleY = ppp.scaleY!
-        }
-
-        if ppp.scaleZ != nil {
-            constants.scaleZ = ppp.scaleZ!
-        }
-
-        if ppp.offsetX != nil {
-            constants.offsetX = ppp.offsetX!
-        }
-
-        if ppp.offsetY != nil {
-            constants.offsetY = ppp.offsetY!
-        }
-
-        if ppp.offsetZ != nil {
-            constants.offsetZ = ppp.offsetZ!
-        }
-
-        if ppp.red != nil {
-            constants.red = ppp.red!
-        }
-
-        if ppp.green != nil {
-            constants.green = ppp.green!
-        }
-
-        if ppp.blue != nil {
-            constants.blue = ppp.blue!
-        }
-
-        if ppp.alpha != nil {
-            constants.alpha = ppp.alpha!
-        }
-        
+        let strokeLayout = try PathPointLayout(layoutMask: stroke.getSpline().layoutMask)
         let returnInkStroke = Quartz2D.InkStroke(
             identifier: stroke.id,
-            spline: stroke.spline,
-            layout: stroke.layout,
-            vectorBrush: Geometry.VectorBrush(polygons: brushPolygons),
-            constants: constants)
+            spline: try stroke.getSpline().copy() as! Spline,
+            layout: strokeLayout,
+            vectorBrush: geometryVectorBrush!,
+            constants: constants,
+            brushName: "",
+            tool: ToolPalette.shared.selectedVectorTool)
         
         returnInkStroke.sensorDataOffset = stroke.sensorDataOffset
         returnInkStroke.sensorDataMappings = stroke.sensorDataMappings

@@ -113,28 +113,32 @@ class RedrawController: RenderingController {
     }
     
     func redrawNextChunk() {
-        let nextChunk = redrawModel.getNextChunk()
-        for dryPath in nextChunk {
+        do {
+            let nextChunk = redrawModel.getNextChunk()
+            for dryPath in nextChunk {
+                renderingContext?.setTarget(currentStrokeLayer)
+                try renderingContext?.clearColor(UIColor.clear)
+                
+                redrawDryStroke(dryPath, renderingContext!)
+                
+                renderingContext?.setTarget(sceneLayer)
+                try renderingContext?.drawLayer(currentStrokeLayer, nil, blendMode: BlendMode.normal)
+                
+                // Blend Current Stroke to All Strokes Layer
+                renderingContext?.setTarget(allStrokesLayer)
+                try renderingContext?.drawLayer(currentStrokeLayer, nil, blendMode: BlendMode.normal)
+            }
+            
+            // Clear CurrentStroke to prepare for next draw
             renderingContext?.setTarget(currentStrokeLayer)
-            renderingContext?.clearColor(UIColor.clear)
+            try renderingContext?.clearColor(UIColor.clear)
             
-            redrawDryStroke(dryPath, renderingContext!)
-            
-            renderingContext?.setTarget(sceneLayer)
-            renderingContext?.drawLayer(currentStrokeLayer, nil, blendMode: BlendMode.normal)
-            
-            // Blend Current Stroke to All Strokes Layer
-            renderingContext?.setTarget(allStrokesLayer)
-            renderingContext?.drawLayer(currentStrokeLayer, nil, blendMode: BlendMode.normal)
+            // Copy the scene to the backbuffer
+            renderingContext?.setTarget(backbufferLayer)
+            try renderingContext?.drawLayer(sceneLayer, nil, blendMode: BlendMode.none)
+        } catch let error {
+            print("ERROR: \(error)")
         }
-        
-        // Clear CurrentStroke to prepare for next draw
-        renderingContext?.setTarget(currentStrokeLayer)
-        renderingContext?.clearColor(UIColor.clear)
-        
-        // Copy the scene to the backbuffer
-        renderingContext?.setTarget(backbufferLayer)
-        renderingContext?.drawLayer(sceneLayer, nil, blendMode: BlendMode.none)
     }
     
     func drawStrokes() {

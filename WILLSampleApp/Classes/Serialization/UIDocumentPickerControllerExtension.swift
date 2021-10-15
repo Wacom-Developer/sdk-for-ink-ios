@@ -14,27 +14,27 @@ extension SerializationQuartz2DController: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         let url = urls.first!
         if isLoad {
-            guard url.startAccessingSecurityScopedResource() else {
-                // Handle the failure here.
-                assert(false, "Could not access security scoped resources")
-                return
+            do {
+                guard url.startAccessingSecurityScopedResource() else {
+                    // Handle the failure here.
+                    throw "Could not access security scoped resources"
+                }
+                
+                // Make sure you release the security-scoped resource when you are done.
+                defer { url.stopAccessingSecurityScopedResource() }
+            
+                try serializationModel!.load(url: url, viewLayer: view.layer)
+            } catch {
+                NSException(name:NSExceptionName(rawValue: "SerializationQuartz2DController.documentPicker"), reason:"\(error)", userInfo:nil).raise()
             }
-            
-            // Make sure you release the security-scoped resource when you are done.
-            defer { url.stopAccessingSecurityScopedResource() }
-            
-            serializationModel!.load(url: url, viewLayer: view.layer)
             isRTreeLeavesShowHandler()
         } else {
             saveModel!.selectedFolderURL = url
-           
-            //let result = saveModel!.validate()
-            
             absolutePathLabel.text = saveModel!.validateMessage//result.message
         }
     }
     
-    func clickSaveButtonHandler() {
+    func clickSaveButtonHandler() throws {
         //let validate = saveModel!.validate()
         if saveModel!.isValid {//, fileName = fileNameTextField.text {
             
@@ -55,7 +55,7 @@ extension SerializationQuartz2DController: UIDocumentPickerDelegate {
             
             defer { saveModel!.selectedFolderURL!.stopAccessingSecurityScopedResource() }
             
-            serializationModel!.save(urlToSave)//, name: saveNameFile)
+            try serializationModel!.save(urlToSave)//, name: saveNameFile)
             absolutePathLabel.text = "Saved successfully in \(urlToSave.path)"
             print("Saved successfully")
         } else {

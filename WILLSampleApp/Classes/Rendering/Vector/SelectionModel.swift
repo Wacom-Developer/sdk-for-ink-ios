@@ -54,36 +54,46 @@ class SelectionModel: ManipulationModel {
         if activeManipulationType == ManipulationType.select {
             let spline = manipulatingInkBuilder.splineProducer!.allData
             
-            let indexX = manipulatingInkBuilder.splineInterpolator!.interpolatedSplineLayout.IndexOf(property: .x)!
-            let indexY = manipulatingInkBuilder.splineInterpolator!.interpolatedSplineLayout.IndexOf(property: .y)!
-            let stride = manipulatingInkBuilder.splineProducer!.dimsCount
-            var offsetIndex = 0
-            assert(spline!.path.count % stride == 0)
-            let steps = spline!.path.count / stride
-            if steps > 0 {
-                selectedContour = []
-                for _ in 0..<steps {
-                    selectedContour!.append(DIPoint2(spline!.path[offsetIndex + indexX], spline!.path[offsetIndex + indexY]))
-                    offsetIndex = offsetIndex + stride
+            if let indexX = manipulatingInkBuilder.splineInterpolator?.interpolatedSplineLayout?.indexOf(property: .x),
+               let indexY = manipulatingInkBuilder.splineInterpolator?.interpolatedSplineLayout?.indexOf(property: .y) {
+                do {
+                    if let stride = try manipulatingInkBuilder.splineProducer?.getDimsCount() {
+                        var offsetIndex = 0
+                        assert(spline!.path.count % stride == 0)
+                        let steps = spline!.path.count / stride
+                        if steps > 0 {
+                            selectedContour = []
+                            for _ in 0..<steps {
+                                selectedContour!.append(DIPoint2(spline!.path[offsetIndex + indexX], spline!.path[offsetIndex + indexY]))
+                                offsetIndex = offsetIndex + stride
+                            }
+                            
+                            instantUpdateBounds =  nil
+                            instantUpdateBounds = path.bounds
+                            
+                            var generatedPath: UIBezierPath?
+                            generateBezierPolys([selectedContour!], result: &generatedPath)
+                            path = generatedPath ?? UIBezierPath()
+                            selectCanvas.path = (path.copy() as! UIBezierPath).cgPath
+                            
+                            instantUpdateBounds = (instantUpdateBounds ==  nil ? selectCanvas.path!.boundingBox : instantUpdateBounds!.union(selectCanvas.path!.boundingBox))
+                        }
+                    } else {
+                        print("Couldn't get stride")
+                    }
+                } catch let error {
+                    print("ERROR: \(error)")
                 }
-                
-                instantUpdateBounds =  nil
-                instantUpdateBounds = path.bounds
-                
-                path = generateBezierPolys([selectedContour!])!
-                selectCanvas.path = (path.copy() as! UIBezierPath).cgPath 
-                
-                instantUpdateBounds = (instantUpdateBounds ==  nil ? selectCanvas.path!.boundingBox : instantUpdateBounds!.union(selectCanvas.path!.boundingBox))
             }
         } else {
-             collectPointsFor()
+            collectPointsFor()
         }
     }
     
-    override func drawingAddedPath(renderingContext: RenderingContext) {
+    override func drawingAddedPath(renderingContext: RenderingContext) throws {
         if activeManipulationType == ManipulationType.draw {
             if isBezierCached {
-                uiBezierPathCache?.addBezierPathCache(for: addedPath, controlPointsCount: drawingInkBuilder.splineProducer!.allData.path.count)
+                uiBezierPathCache?.addBezierPathCache(for: addedPath, controlPointsCount: drawingInkBuilder.splineProducer!.allData!.path.count)
                 //drawingInkBuilder.splineProducer!.allData.path.count
                //uiBezierPathCache!.addBezierPathCache(for: addedPath, drawingSplineProducer: drawingInkBuilder.splineProducer!)
             }
@@ -101,7 +111,7 @@ class SelectionModel: ManipulationModel {
             }
         }
         
-        super.drawingAddedPath(renderingContext: renderingContext)
+        try super.drawingAddedPath(renderingContext: renderingContext)
     }
     
     override func set(manipulationType: ManipulationType) {
@@ -116,8 +126,12 @@ class SelectionModel: ManipulationModel {
             return false
         }
         else {
-            manipulator!.select(points: selectedContour!, integrityMode, .bilateralOverlap, isBezierCached: isBezierCached, onStrokeSelected: selectCallback)
-            clearSelectCanvas()
+            do {
+                try manipulator!.select(points: selectedContour!, integrityMode, .bilateralOverlap, isBezierCached: isBezierCached, onStrokeSelected: selectCallback)
+                clearSelectCanvas()
+            } catch let error {
+                print("ERROR: \(error)")
+            }
         }
         
         return true

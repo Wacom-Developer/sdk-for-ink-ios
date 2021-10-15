@@ -137,47 +137,60 @@ class ManipulationModel: VectorBrushModel {
     
     func collectPointsFor() {
         if let allDataSpline = drawingInkBuilder.splineProducer!.allData {
-            let stroke = WillRendering.InkStroke(
-                identifier: Identifier.fromNewUUID(),
-                spline: Spline(layoutMask: drawingInkBuilder.splineProducer!.pathLayout.channelMask, path: allDataSpline.path, tStart: allDataSpline.tStart, tFinal: allDataSpline.tFinal),
-                layout: drawingInkBuilder.pathPointLayout,
-                vectorBrush: drawingInkBuilder.brushApplier.prototype,
-                constants: WillRendering.ConstantAttributes(
-                    size: drawingInkBuilder.brushApplier.defaultSize,
-                    rotation: drawingInkBuilder.brushApplier.defaultRotation,
-                    scale: drawingInkBuilder.brushApplier.defaultScale,
-                    offset: drawingInkBuilder.brushApplier.defaultOffset)
-            )
+            guard let identifier = Identifier.fromNewUUID() else {
+                print("Couldn't generate an Identifier")
+                return
+            }
             
-            
-            if let strokeIndex = manipulator!.add(stroke: stroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil) {//spline: spline) {
-                canvasCache.dryStrokes[strokeIndex] = CanvasCache.DryStroke(canvas: canvas, stroke: stroke)
+            do {
+                let stroke = WillRendering.InkStroke(
+                    identifier: identifier,
+                    spline: try Spline(layoutMask: drawingInkBuilder.splineProducer!.pathLayout!.channelMask, path: allDataSpline.path, tStart: allDataSpline.tStart, tFinal: allDataSpline.tFinal),
+                    layout: drawingInkBuilder.pathPointLayout,
+                    vectorBrush: try drawingInkBuilder.brushApplier.getPrototype(),
+                    constants: WillRendering.ConstantAttributes(
+                        size: drawingInkBuilder.brushApplier.defaultSize,
+                        rotation: drawingInkBuilder.brushApplier.defaultRotation,
+                        scale: drawingInkBuilder.brushApplier.defaultScale,
+                        offset: drawingInkBuilder.brushApplier.defaultOffset)
+                )
+                
+                
+                if let strokeIndex = try manipulator!.add(stroke: stroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil) {//spline: spline) {
+                    canvasCache.dryStrokes[strokeIndex] = CanvasCache.DryStroke(canvas: canvas, stroke: stroke)
+                }
+            } catch let error {
+                print("ERROR: \(error)")
             }
         }
     }
     
     private func initReconstructInkBuilder(_ stroke: InkStrokeProtocol) {
-        if recostructInkBilder == nil || (
-            recostructInkBilder!.brushApplier.prototype != stroke.vectorBrush ||
-                recostructInkBilder!.brushApplier.defaultSize != stroke.constants.size ||
-                recostructInkBilder!.brushApplier.defaultRotation != stroke.constants.rotation ||
-                recostructInkBilder!.brushApplier.defaultScale.x != stroke.constants.scaleX ||
-                recostructInkBilder!.brushApplier.defaultScale.y != stroke.constants.scaleY ||
-                recostructInkBilder!.brushApplier.defaultScale.z != stroke.constants.scaleZ ||
-                recostructInkBilder!.brushApplier.defaultOffset.x != stroke.constants.offsetX ||
-                recostructInkBilder!.brushApplier.defaultOffset.y != stroke.constants.offsetY ||
-                recostructInkBilder!.brushApplier.defaultOffset.z != stroke.constants.offsetZ ||
-                recostructInkBilder!.pathPointLayout != stroke.layout
-            ) {
-            recostructInkBilder = ManipulationVectorInkBuilder(
-                collectPointData: true, 
-                stroke.layout,
-                brushPrototype: stroke.vectorBrush,
-                defaultSize: stroke.constants.size,
-                defaultRotation: stroke.constants.rotation,
-                defaultScale: DIFloat3(stroke.constants.scaleX, stroke.constants.scaleY, stroke.constants.scaleZ),
-                defaultOffset: DIFloat3(stroke.constants.offsetX, stroke.constants.offsetY, stroke.constants.offsetZ),
-                keepSplineProducerAllData: true)
+        do {
+            if try recostructInkBilder == nil || (
+                try recostructInkBilder!.brushApplier.getPrototype() != stroke.vectorBrush ||
+                    recostructInkBilder!.brushApplier.defaultSize != stroke.constants.size ||
+                    recostructInkBilder!.brushApplier.defaultRotation != stroke.constants.rotation ||
+                    recostructInkBilder!.brushApplier.defaultScale.x != stroke.constants.scaleX ||
+                    recostructInkBilder!.brushApplier.defaultScale.y != stroke.constants.scaleY ||
+                    recostructInkBilder!.brushApplier.defaultScale.z != stroke.constants.scaleZ ||
+                    recostructInkBilder!.brushApplier.defaultOffset.x != stroke.constants.offsetX ||
+                    recostructInkBilder!.brushApplier.defaultOffset.y != stroke.constants.offsetY ||
+                    recostructInkBilder!.brushApplier.defaultOffset.z != stroke.constants.offsetZ ||
+                    recostructInkBilder!.pathPointLayout != stroke.layout
+                ) {
+                recostructInkBilder = ManipulationVectorInkBuilder(
+                    collectPointData: true,
+                    stroke.layout,
+                    brushPrototype: stroke.vectorBrush,
+                    defaultSize: stroke.constants.size,
+                    defaultRotation: stroke.constants.rotation,
+                    defaultScale: DIFloat3(stroke.constants.scaleX, stroke.constants.scaleY, stroke.constants.scaleZ),
+                    defaultOffset: DIFloat3(stroke.constants.offsetX, stroke.constants.offsetY, stroke.constants.offsetZ),
+                    keepSplineProducerAllData: true)
+            }
+        } catch let error {
+            print("ERROR: \(error)")
         }
     }
     

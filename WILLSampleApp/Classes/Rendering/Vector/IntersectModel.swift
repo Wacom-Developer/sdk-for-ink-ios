@@ -41,16 +41,16 @@ class IntersectModel: ManipulationModel {
         }
     }
     
-    override func drawingAddedPath(renderingContext: RenderingContext) {
+    override func drawingAddedPath(renderingContext: RenderingContext) throws {
         if activeManipulationType == ManipulationType.intersect {
             needRedrawing = false
             
             if let spline = manipulatingInkBuilder.addedSpline {
                 let erasedStroke = WillRendering.InkStroke(
-                    identifier: Identifier.fromNewUUID(),
+                    identifier: Identifier.fromNewUUID()!,
                     spline: spline,
                     layout: manipulatingInkBuilder.pathPointLayout,
-                    vectorBrush: manipulatingInkBuilder.brushApplier.prototype,
+                    vectorBrush: try manipulatingInkBuilder.brushApplier.getPrototype(),
                     constants: WillRendering.ConstantAttributes(
                         size: manipulatingInkBuilder.brushApplier.defaultSize,
                         rotation: manipulatingInkBuilder.brushApplier.defaultRotation,
@@ -58,13 +58,13 @@ class IntersectModel: ManipulationModel {
                         offset: manipulatingInkBuilder.brushApplier.defaultOffset)
                 )
                 
-                manipulator!.intersect(stroke: erasedStroke, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: onIntersectStroke)
+                try manipulator!.intersect(stroke: erasedStroke, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: onIntersectStroke)
             }
         } else // drawing
         {
             if isBezierCached {
                 //drawingInkBuilder.splineProducer!.allData.path.count / drawingInkBuilder.splineProducer!.dimsCount
-                uiBezierPathCache!.addBezierPathCache(for: addedPath, controlPointsCount: drawingInkBuilder.splineProducer!.allData.path.count / drawingInkBuilder.splineProducer!.dimsCount)
+                uiBezierPathCache!.addBezierPathCache(for: addedPath, controlPointsCount: drawingInkBuilder.splineProducer!.allData!.path.count / (try drawingInkBuilder.splineProducer!.getDimsCount()))
                 //uiBezierPathCache!.addBezierPathCache(for: addedPath, drawingSplineProducer: drawingInkBuilder.splineProducer!)
             }
         }
@@ -81,7 +81,7 @@ class IntersectModel: ManipulationModel {
             }
         }
         
-        super.drawingAddedPath(renderingContext: renderingContext)
+        try super.drawingAddedPath(renderingContext: renderingContext)
     }
     
     private func onIntersectStroke(_ resultStroke: ResultManipulatedStroke) {
@@ -100,7 +100,11 @@ class IntersectModel: ManipulationModel {
         addResultStrokes(strokes: resultStroke.notSelectedResultStrokes, canvasCache.layer!.metalLayer!, fillColor!, index!)
         
         for resultStroke in resultStroke.selectedResultStrokes {
-            manipulator!.spatialContext!.remove(inkStrokeId: resultStroke.stroke.id)
+            do {
+                try manipulator!.spatialContext!.remove(inkStrokeId: resultStroke.stroke.id)
+            } catch let error {
+                print("ERROR: \(error)")
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Qbl-ik-AcS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Qbl-ik-AcS">
     <device id="ipad10_5" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -249,9 +249,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8K0-uL-owN">
-                                <rect key="frame" x="67" y="1060" width="38" height="32"/>
+                                <rect key="frame" x="67" y="1060" width="80" height="32"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
-                                <state key="normal" title="Save"/>
+                                <state key="normal" title="Save (uim)"/>
                                 <connections>
                                     <action selector="didTapSave:" destination="pm6-kp-hdK" eventType="touchUpInside" id="6np-gk-lce"/>
                                 </connections>
@@ -280,6 +280,14 @@
                                     <action selector="didTapSelect:" destination="pm6-kp-hdK" eventType="touchUpInside" id="FfD-t5-8nj"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RDr-DB-rRd">
+                                <rect key="frame" x="155" y="1060" width="85" height="32"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
+                                <state key="normal" title="Save (PDF)"/>
+                                <connections>
+                                    <action selector="didTapSaveAsPDF:" destination="pm6-kp-hdK" eventType="touchUpInside" id="ulr-NN-ffs"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="zKE-jf-Hqq"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -291,10 +299,12 @@
                             <constraint firstItem="z08-xP-hwV" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="20" id="PvA-sx-4uJ"/>
                             <constraint firstItem="NQv-R5-aKM" firstAttribute="top" secondItem="w9Y-p9-OHr" secondAttribute="bottom" constant="8" symbolic="YES" id="RuY-jl-hJN"/>
                             <constraint firstItem="BfS-K0-D4a" firstAttribute="leading" secondItem="zKE-jf-Hqq" secondAttribute="leading" constant="20" id="Uih-2P-1kl"/>
+                            <constraint firstItem="RDr-DB-rRd" firstAttribute="centerY" secondItem="8K0-uL-owN" secondAttribute="centerY" id="fuu-So-kcl"/>
                             <constraint firstItem="w9Y-p9-OHr" firstAttribute="centerX" secondItem="zKE-jf-Hqq" secondAttribute="centerX" id="ggO-B1-fdM"/>
                             <constraint firstItem="zKE-jf-Hqq" firstAttribute="trailing" secondItem="z08-xP-hwV" secondAttribute="trailing" constant="20" id="iaV-pm-xo5"/>
                             <constraint firstItem="BfS-K0-D4a" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="20" id="klc-OM-BuG"/>
                             <constraint firstItem="w9Y-p9-OHr" firstAttribute="top" secondItem="zKE-jf-Hqq" secondAttribute="top" constant="10" id="niy-ci-WMQ"/>
+                            <constraint firstItem="RDr-DB-rRd" firstAttribute="leading" secondItem="8K0-uL-owN" secondAttribute="trailing" constant="8" symbolic="YES" id="tpd-hZ-VPO"/>
                             <constraint firstItem="zKE-jf-Hqq" firstAttribute="bottom" secondItem="R41-kL-xIa" secondAttribute="bottom" constant="20" id="wBA-Dq-pWL"/>
                         </constraints>
                     </view>
@@ -349,7 +359,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2fA-j7-9nM">
-                                <rect key="frame" x="386" y="529" width="62" height="104"/>
+                                <rect key="frame" x="386" y="539" width="62" height="104"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V6a-Kw-8Zc">
                                         <rect key="frame" x="0.0" y="67" width="62" height="37"/>
@@ -398,7 +408,7 @@
             <objects>
                 <navigationController id="Qbl-ik-AcS" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="TGt-A1-yCV">
-                        <rect key="frame" x="0.0" y="0.0" width="834" height="50"/>
+                        <rect key="frame" x="0.0" y="20" width="834" height="50"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>

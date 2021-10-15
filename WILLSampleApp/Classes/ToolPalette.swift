@@ -19,19 +19,37 @@ protocol RasterTool {
 }
 
 protocol VectorTool {
-    func brush() -> Geometry.VectorBrush
+    func brush() -> ExtendedVectorBrush
     func getCalculator(inputType: UITouch.TouchType) -> Calculator?
     func getLayout(inputType: UITouch.TouchType) -> PathPointLayout?
+    func getURIs() -> [BrushPolygonUri]
+}
+
+class ExtendedVectorBrush {
+    var vectorBrush: Geometry.VectorBrush
+    var name: String
+    
+    init(vectorBrush: Geometry.VectorBrush, name: String) {
+        self.vectorBrush = vectorBrush
+        self.name = name
+    }
 }
 
 class Pen: VectorTool {
-    func brush() -> Geometry.VectorBrush {
-        return Geometry.VectorBrush(polygons: [
-            BrushPolygon(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
-            BrushPolygon(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
-            BrushPolygon(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
-            BrushPolygon(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
-        ])
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Pen")
+    }
+    
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
     }
     
     func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
@@ -99,13 +117,20 @@ class Pen: VectorTool {
 }
 
 class Felt: VectorTool {
-    func brush() -> Geometry.VectorBrush {
-        return Geometry.VectorBrush(polygons: [
-            BrushPolygon(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
-            BrushPolygon(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
-            BrushPolygon(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
-            BrushPolygon(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
-        ])
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Felt")
+    }
+    
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
     }
     
     func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
@@ -196,13 +221,20 @@ class Felt: VectorTool {
 }
 
 class Brush: VectorTool {
-    func brush() -> Geometry.VectorBrush {
-        return Geometry.VectorBrush(polygons: [
-            BrushPolygon(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
-            BrushPolygon(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
-            BrushPolygon(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
-            BrushPolygon(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
-        ])
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Brush")
+    }
+    
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
     }
     
     func getCalculator(inputType: UITouch.TouchType) -> Calculator? {

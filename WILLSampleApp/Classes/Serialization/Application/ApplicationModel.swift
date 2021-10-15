@@ -77,17 +77,19 @@ class ApplicationModel {
         }
     }
     
-    func write(to url: URL) {
+    func write(to url: URL) throws {
         let will3Codec = Will3Codec();
-        let binaries = will3Codec.encode(inkModel: inkModel)
+        let binaries = try will3Codec.encode(inkModel: getInkModel())
         let data = Data(binaries)
         
-        do {
-            try data.write(to: url)
-        } catch {
-            print(error.localizedDescription)
-            assert(false)
-        }
+        try data.write(to: url)
+    }
+    
+    func writePDF(to url: URL) throws {
+        let inkModel = try getInkModel()
+        
+        let pdfExporter = PDFExporter()
+        let pdf = pdfExporter.exportToPDF(inkDocument: inkModel, pdfWidth: PDFExporter.PDF_A4_WIDTH, pdfHeight: PDFExporter.PDF_A4_HEIGHT, fit: true)
     }
     
     func hasVectorInk(url: URL) -> Bool {
@@ -95,11 +97,11 @@ class ApplicationModel {
             let data = try Data(contentsOf: url)
             let bytes = [UInt8](data)
             let will3Codec = Will3Codec()
-            let decodedInkModel = will3Codec.decode(dataBuffer: bytes)
+            let decodedInkModel = try will3Codec.decode(dataBuffer: bytes)
             
             return decodedInkModel.hasVectorInk
         } catch let error {
-            print("error -> \(error)")
+            print("ERROR: \(error)")
         }
         
         return false
@@ -110,11 +112,11 @@ class ApplicationModel {
             let data = try Data(contentsOf: url)
             let bytes = [UInt8](data)
             let will3Codec = Will3Codec()
-            let decodedInkModel = will3Codec.decode(dataBuffer: bytes)
+            let decodedInkModel = try will3Codec.decode(dataBuffer: bytes)
             
             return decodedInkModel.hasRasterInk
         } catch let error {
-            print("error -> \(error)")
+            print("ERROR: \(error)")
         }
         
         return false
@@ -125,7 +127,7 @@ class ApplicationModel {
             let data = try Data(contentsOf: url)
             let bytes = [UInt8](data)
             let will3Codec = Will3Codec()
-            let decodedInkModel = will3Codec.decode(dataBuffer: bytes)
+            let decodedInkModel = try will3Codec.decode(dataBuffer: bytes)
             
             decodedInkModel.printModel()
             
@@ -147,7 +149,9 @@ class ApplicationModel {
     func removeCanvases() {
         if let strokes = strokes.values {
             for stroke in strokes {
-                stroke.canvas!.removeFromSuperlayer()
+                if stroke.canvas != nil {
+                    stroke.canvas!.removeFromSuperlayer()
+                }
             }
         }
     }
@@ -172,12 +176,16 @@ class ApplicationModel {
             self.devices[device.id] = device
         }
         
-        currentDevice = InputDevice();
-        currentDevice!.properties!["dev.id"] = UIDevice.current.identifierForVendor!.description
-        currentDevice!.properties!["dev.name"] = UIDevice.current.name //m_eas.FriendlyName;
-        currentDevice!.properties!["dev.model"] = UIDevice.current.model
-        currentDevice!.properties!["dev.manufacturer"] = "Apple Corporation" //m_eas.SystemManufacturer;
-        currentDevice!.seal();
+        do {
+            currentDevice = InputDevice();
+            try _ = currentDevice?.properties?.setValue(by: "dev.id", value: UIDevice.current.identifierForVendor!.description)
+            try _ = currentDevice?.properties?.setValue(by: "dev.name", value: UIDevice.current.name) //m_eas.FriendlyName;
+            try _ = currentDevice?.properties?.setValue(by: "dev.model", value: UIDevice.current.model)
+            try _ = currentDevice?.properties?.setValue(by: "dev.manufacturer", value: "Apple Corporation") //m_eas.SystemManufacturer;
+            currentDevice!.seal();
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         if let device = self.devices[currentDevice!.id], device == currentDevice {
             print("Already have input device: \(device)")
@@ -191,10 +199,14 @@ class ApplicationModel {
             self.environments[env.id] = env
         }
         
-        currentEnvironment = Environment();
-        currentEnvironment!.properties!["os.name"] = UIDevice.current.systemName //m_eas.OperatingSystem;
-        currentEnvironment!.properties!["os.version.code"] = UIDevice.current.systemVersion
-        currentEnvironment!.seal()
+        do {
+            currentEnvironment = Environment();
+            try _ = currentDevice?.properties?.setValue(by: "os.name", value: UIDevice.current.systemName) //m_eas.OperatingSystem;
+            try _ = currentDevice?.properties?.setValue(by: "os.version.code", value: UIDevice.current.systemVersion)
+            currentEnvironment!.seal()
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         if let env = self.environments[currentEnvironment!.id], env == currentEnvironment {
             print("Already have environment: \(env)")
@@ -222,91 +234,116 @@ class ApplicationModel {
         }
     }
     
-    private func createSensorChannelContext(by sensorPointerData: [PointerData], touchType: UITouch.TouchType) -> SensorChannelsContext {
-        let precision: UInt32 = 2
-        
-        // Add all sensor channels except 'Custom'
-        var sensorChannels: [SensorChannel] = [
-            SensorChannel(InkSensorType.x, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
-            SensorChannel(InkSensorType.y,  metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
-            SensorChannel(InkSensorType.timestamp, metric: InkSensorMetricType.time, resolution: nil, min: 0.0, max: 0.0, precision: 0)
-        ]
-        
-        if sensorPointerData.first!.force != nil {
-            sensorChannels.append(SensorChannel(InkSensorType.pressure, metric: InkSensorMetricType.normalized, resolution: nil, min: 0.0, max: 1.0, precision: precision))
+    private func createSensorChannelContext(by sensorPointerData: [PointerData], touchType: UITouch.TouchType) -> SensorChannelsContext? {
+        do {
+            let precision: UInt32 = 2
+            
+            // Add all sensor channels except 'Custom'
+            var sensorChannels: [SensorChannel] = [
+                try SensorChannel(InkSensorType.x, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
+                try SensorChannel(InkSensorType.y,  metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
+                try SensorChannel(InkSensorType.timestamp, metric: InkSensorMetricType.time, resolution: nil, min: 0.0, max: 0.0, precision: 0)
+            ]
+            
+            if sensorPointerData.first!.force != nil {
+                sensorChannels.append(try SensorChannel(InkSensorType.pressure, metric: InkSensorMetricType.normalized, resolution: nil, min: 0.0, max: 1.0, precision: precision))
+            }
+            
+            if sensorPointerData.first!.radius != nil {
+                sensorChannels.append(try SensorChannel(InkSensorType.radiusX, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision))
+            }
+            
+            if sensorPointerData.first!.azimuthAngle != nil {
+                sensorChannels.append(try SensorChannel(InkSensorType.azimuth, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
+            }
+            
+            if sensorPointerData.first!.altitudeAngle != nil {
+                sensorChannels.append(try SensorChannel(InkSensorType.altitude, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
+            }
+            
+            let sensorChannelGroup = try SensorChannelsContext(
+                currentInkInputProviders![ApplicationModel.getInkInputType(by: touchType)]!,
+                currentDevice!,
+                sensorChannels);
+            
+            return sensorChannelGroup;
+        } catch let error {
+            print("ERROR: \(error)")
         }
         
-        if sensorPointerData.first!.radius != nil {
-            sensorChannels.append(SensorChannel(InkSensorType.radiusX, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision))
-        }
-        
-        if sensorPointerData.first!.azimuthAngle != nil {
-            sensorChannels.append(SensorChannel(InkSensorType.azimuth, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
-        }
-        
-        if sensorPointerData.first!.altitudeAngle != nil {
-            sensorChannels.append(SensorChannel(InkSensorType.altitude, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
-        }
-        
-        let sensorChannelGroup = SensorChannelsContext(
-            currentInkInputProviders![ApplicationModel.getInkInputType(by: touchType)]!,
-            currentDevice!,
-            sensorChannels);
-        
-        return sensorChannelGroup;
+        return nil
     }
     
     private func retrieveSensorData(by sensorPointerData: [PointerData], touchType: UITouch.TouchType) -> SensorData? {
-        if sensorPointerData.count == 0 {
-            return nil
-        }
-        
-        // Create the sensor channel groups using the input provider and device
-        let defaultSensorChannelsContext = createSensorChannelContext(by: sensorPointerData, touchType: touchType)
-        
-        // Create the sensor context using the sensor channels contexts
-        let sensorContext = SensorContext();
-        sensorContext.addSensorChannelsContext(sensorChannelsContext: defaultSensorChannelsContext);
-        
-        if sensorContexts[sensorContext.id] == nil {
-            sensorContexts[sensorContext.id] = sensorContext
-        }
-        
-        let inputContext = InputContext(environmentId: currentEnvironment!.id, sensorContextId: sensorContext.id);
-        
-        if inputContexts[inputContext.id] == nil {
-            inputContexts[inputContext.id] = inputContext
-        }
-        
-        // Create sensor data using the input context
-        let sensorData = SensorData(
-            id: Identifier.fromNewUUID(),
-            inputContextId: inputContext.id,
-            state: InkState.plane);
-        
-        // Fill the default channels with the sensor data
-        let channels = sensorContext.defaultSensorChannelsContext!;
-        
-        sensorData.addData(channels.getChannel(typeUri: InkSensorType.x)!, sensorPointerData.map({$0.x}))
-        sensorData.addData(channels.getChannel(typeUri: InkSensorType.y)!, sensorPointerData.map({$0.y}))
-        sensorData.addTimestampData(sensorChannel: channels.getChannel(typeUri: InkSensorType.timestamp)!, values: sensorPointerData.map({UInt64($0.timestamp)}))
+        do {
+            if sensorPointerData.count == 0 {
+                return nil
+            }
+            
+            // Create the sensor channel groups using the input provider and device
+            let defaultSensorChannelsContext = createSensorChannelContext(by: sensorPointerData, touchType: touchType)
+            
+            guard let defaultContext = defaultSensorChannelsContext else {
+                return nil
+            }
+            
+            // Create the sensor context using the sensor channels contexts
+            let sensorContext = SensorContext();
+            try sensorContext.addSensorChannelsContext(sensorChannelsContext: defaultContext);
+            
+            if sensorContexts[sensorContext.id] == nil {
+                sensorContexts[sensorContext.id] = sensorContext
+            }
+            
+            let inputContext = InputContext(environmentId: currentEnvironment!.id, sensorContextId: sensorContext.id);
+            
+            if inputContexts[inputContext.id] == nil {
+                inputContexts[inputContext.id] = inputContext
+            }
+            
+            if let id = Identifier.fromNewUUID() {
+                // Create sensor data using the input context
+                let sensorData = SensorData(
+                    id: id,
+                    inputContextId: inputContext.id,
+                    state: InkState.plane);
+                
+                // Fill the default channels with the sensor data
+                let channels = sensorContext.defaultSensorChannelsContext!;
+                
+                do {
+                    try sensorData.addData(channels.getChannel(typeUri: InkSensorType.x)!, sensorPointerData.map({$0.x}))
+                    try sensorData.addData(channels.getChannel(typeUri: InkSensorType.y)!, sensorPointerData.map({$0.y}))
+                    try sensorData.addTimestampData(sensorChannel: channels.getChannel(typeUri: InkSensorType.timestamp)!, values: sensorPointerData.map({UInt64($0.timestamp)}))
 
-        if sensorPointerData.first!.force != nil {
-            sensorData.addData(channels.getChannel(typeUri: InkSensorType.pressure)!, sensorPointerData.map({$0.force!}))
+                    if sensorPointerData.first!.force != nil {
+                        try sensorData.addData(channels.getChannel(typeUri: InkSensorType.pressure)!, sensorPointerData.map({$0.force!}))
+                    }
+                    
+                    if sensorPointerData.first!.radius != nil {
+                        try sensorData.addData(channels.getChannel(typeUri: InkSensorType.radiusX)!, sensorPointerData.map({$0.radius!}))
+                    }
+                    
+                    if sensorPointerData.first!.azimuthAngle != nil {
+                        try sensorData.addData(channels.getChannel(typeUri: InkSensorType.azimuth)!, sensorPointerData.map({$0.azimuthAngle!}))
+                    }
+                    
+                    if sensorPointerData.first!.altitudeAngle != nil {
+                        try sensorData.addData(channels.getChannel(typeUri: InkSensorType.altitude)!, sensorPointerData.map({$0.altitudeAngle!}))
+                    }
+                
+                    return sensorData
+                } catch let error {
+                    print("ERROR: \(error)")
+                }
+                
+            } else {
+                print("ERROR: Identifier.fromNewUUID() returned nil")
+            }
+        } catch let error {
+            print("ERROR: \(error)")
         }
         
-        if sensorPointerData.first!.radius != nil {
-            sensorData.addData(channels.getChannel(typeUri: InkSensorType.radiusX)!, sensorPointerData.map({$0.radius!}))
-        }
-        
-        if sensorPointerData.first!.azimuthAngle != nil {
-            sensorData.addData(channels.getChannel(typeUri: InkSensorType.azimuth)!, sensorPointerData.map({$0.azimuthAngle!}))
-        }
-        
-        if sensorPointerData.first!.altitudeAngle != nil {
-            sensorData.addData(channels.getChannel(typeUri: InkSensorType.altitude)!, sensorPointerData.map({$0.altitudeAngle!}))
-        }
-    
-        return sensorData
+        return nil
     }
 }

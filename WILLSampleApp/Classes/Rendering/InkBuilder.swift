@@ -60,7 +60,7 @@ class InkBuilder {
         return pointerDataList;
     }
     
-    public func add(phase: Phase,_ touchData: PointerData?,_ predictedeTouchData: PointerData?) {
+    public func add(phase: Phase,_ touchData: PointerData?,_ predictedeTouchData: PointerData?) throws {
         if collectPointerData {
             if multipleAddStart == false {
                 multipleAddStart = true
@@ -68,18 +68,17 @@ class InkBuilder {
                     pointerDataList = []
                 }
             }
-        
+            
             pointerDataList.append(touchData!)
         }
         
-        let (addedGeometry, predictedGeometry) = pathProducer!.add(phase: phase, addition: touchData, prediction: predictedeTouchData)
+        let (addedGeometry, predictedGeometry) = try pathProducer!.add(phase: phase, addedPointerData: touchData, predictedPointerData: predictedeTouchData)
         
-        m_pathSegment.add(phase: phase, addedGeometry!, predictedGeometry!)
+        m_pathSegment.add(phase: phase, addedGeometry ?? [], predictedGeometry ?? [])
         m_pointerDataUploadCount = m_pointerDataUploadCount + 1
     }
     
-    open func add(phase: Phase, touches: Set<UITouch>, event: UIEvent, view: UIView)
-    {
+    open func add(phase: Phase, touches: Set<UITouch>, event: UIEvent, view: UIView) {
         multipleAddStart = false
         
         for touch in touches {
@@ -91,7 +90,11 @@ class InkBuilder {
                 predictedeTouchData = getTouchDataBy(phase: phase, touch: predictedTouch, view: view)
             }
             
-            add(phase: phase, touchData, predictedeTouchData)
+            do {
+                try add(phase: phase, touchData, predictedeTouchData)
+            } catch {
+                NSException(name:NSExceptionName(rawValue: "InkBuilder.add"), reason:"\(error)", userInfo:nil).raise()
+            }
         }
         
         multipleAddStart = false

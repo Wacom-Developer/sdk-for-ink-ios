@@ -251,7 +251,12 @@ class SerializationQuartz2DController : UIViewController {
     }
     
     @objc func clickSaveButton(sender: UIButton) {
-        clickSaveButtonHandler()
+        do {
+            try clickSaveButtonHandler()
+        }
+        catch {
+            NSException(name:NSExceptionName(rawValue: "SerializationQuartz2DController.clickSaveButton"), reason:"\(error)", userInfo:nil).raise()
+        }
     }
     
     @objc func clickLoadButton(sender: UIButton) {

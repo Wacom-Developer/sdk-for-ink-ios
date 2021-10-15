@@ -26,6 +26,8 @@
 		49351A282489892A00DCB5CC /* IntersectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49351A272489892A00DCB5CC /* IntersectModel.swift */; };
 		49351A2A2489896800DCB5CC /* WillRenderingInkStrokeimpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49351A292489896800DCB5CC /* WillRenderingInkStrokeimpl.swift */; };
 		49351A2C248989A800DCB5CC /* ManipulationVectorInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49351A2B248989A800DCB5CC /* ManipulationVectorInk.swift */; };
+		494836B22719A4300065C737 /* WacomInk.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 494836B12719A4300065C737 /* WacomInk.xcframework */; };
+		494836B32719A4300065C737 /* WacomInk.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 494836B12719A4300065C737 /* WacomInk.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		494D96C02427B0E0008C2FBC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D96BF2427B0E0008C2FBC /* AppDelegate.swift */; };
 		494D96C22427B0E0008C2FBC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D96C12427B0E0008C2FBC /* SceneDelegate.swift */; };
 		494D96C72427B0E0008C2FBC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 494D96C52427B0E0008C2FBC /* Main.storyboard */; };
@@ -40,9 +42,12 @@
 		494D96EC2427FFD0008C2FBC /* shape2.png in Resources */ = {isa = PBXBuildFile; fileRef = 494D96EB2427FFD0008C2FBC /* shape2.png */; };
 		495E8EFE249765FC009CAA1D /* WelcomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495E8EFD249765FC009CAA1D /* WelcomeScreenViewController.swift */; };
 		49664D2024AF753C009AF761 /* UIDocumentPickerSaveModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49664D1F24AF753C009AF761 /* UIDocumentPickerSaveModel.swift */; };
+		496FD8EF26C40CE0002FB980 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496FD8EE26C40CE0002FB980 /* Utils.swift */; };
+		499B9C01270DCC05006DE6C2 /* URIShapeResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499B9C00270DCC05006DE6C2 /* URIShapeResolver.swift */; };
 		49B8305B246D6A7C00E8079F /* VectorBrushModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B8305A246D6A7C00E8079F /* VectorBrushModel.swift */; };
 		49B8305F246D6AE500E8079F /* VectorInkBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B8305E246D6AE500E8079F /* VectorInkBuilder.swift */; };
 		49B9E24324B5DD200092054D /* VectorBrushFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B9E24224B5DD200092054D /* VectorBrushFactory.swift */; };
+		49D8BE2727035AC00076BEF0 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D8BE2627035AC00076BEF0 /* PDFExporter.swift */; };
 		49DE4C89247EE56A0074F457 /* MathUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DE4C88247EE56A0074F457 /* MathUtils.swift */; };
 		49DE4C91247FEA9D0074F457 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = 49DE4C90247FEA9D0074F457 /* SwiftProtobuf */; };
 		49E248132475169F0052E426 /* ToolPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E248122475169F0052E426 /* ToolPalette.swift */; };
@@ -51,6 +56,20 @@
 		49E2481D24758FAD0052E426 /* essential_fill_14.png in Resources */ = {isa = PBXBuildFile; fileRef = 49E2481C24758FAD0052E426 /* essential_fill_14.png */; };
 		49E2481F2475957F0052E426 /* essential_fill_11.png in Resources */ = {isa = PBXBuildFile; fileRef = 49E2481E2475957F0052E426 /* essential_fill_11.png */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		49F0AED9271977F200A205DB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				494836B32719A4300065C737 /* WacomInk.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		491687B7248E122A008716D1 /* SelectionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionModel.swift; sourceTree = "<group>"; };
@@ -73,6 +92,7 @@
 		49351A272489892A00DCB5CC /* IntersectModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntersectModel.swift; sourceTree = "<group>"; };
 		49351A292489896800DCB5CC /* WillRenderingInkStrokeimpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WillRenderingInkStrokeimpl.swift; sourceTree = "<group>"; };
 		49351A2B248989A800DCB5CC /* ManipulationVectorInk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManipulationVectorInk.swift; sourceTree = "<group>"; };
+		494836B12719A4300065C737 /* WacomInk.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = WacomInk.xcframework; sourceTree = "<group>"; };
 		494D96BC2427B0E0008C2FBC /* WILL 3 Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WILL 3 Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		494D96BF2427B0E0008C2FBC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		494D96C12427B0E0008C2FBC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -89,9 +109,12 @@
 		494D96EB2427FFD0008C2FBC /* shape2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shape2.png; sourceTree = "<group>"; };
 		495E8EFD249765FC009CAA1D /* WelcomeScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreenViewController.swift; sourceTree = "<group>"; };
 		49664D1F24AF753C009AF761 /* UIDocumentPickerSaveModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIDocumentPickerSaveModel.swift; sourceTree = "<group>"; };
+		496FD8EE26C40CE0002FB980 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		499B9C00270DCC05006DE6C2 /* URIShapeResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URIShapeResolver.swift; sourceTree = "<group>"; };
 		49B8305A246D6A7C00E8079F /* VectorBrushModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorBrushModel.swift; sourceTree = "<group>"; };
 		49B8305E246D6AE500E8079F /* VectorInkBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorInkBuilder.swift; sourceTree = "<group>"; };
 		49B9E24224B5DD200092054D /* VectorBrushFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorBrushFactory.swift; sourceTree = "<group>"; };
+		49D8BE2627035AC00076BEF0 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PDFExporter.swift; path = ../../../../../Desktop/PDFExporter.swift; sourceTree = "<group>"; };
 		49DE4C88247EE56A0074F457 /* MathUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathUtils.swift; sourceTree = "<group>"; };
 		49E248122475169F0052E426 /* ToolPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolPalette.swift; sourceTree = "<group>"; };
 		49E24814247519A50052E426 /* essential_fill_17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = essential_fill_17.png; sourceTree = "<group>"; };
@@ -105,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				494836B22719A4300065C737 /* WacomInk.xcframework in Frameworks */,
 				49DE4C91247FEA9D0074F457 /* SwiftProtobuf in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,6 +162,7 @@
 				491687DB248F85BE008716D1 /* EnumType.swift */,
 				491687DD248F8626008716D1 /* Extensions.swift */,
 				49B9E24224B5DD200092054D /* VectorBrushFactory.swift */,
+				49D8BE2627035AC00076BEF0 /* PDFExporter.swift */,
 			);
 			path = Serialization;
 			sourceTree = "<group>";
@@ -149,6 +174,7 @@
 				491687C5248F81EA008716D1 /* ApplicationStroke.swift */,
 				491687C6248F81EA008716D1 /* ApplicationModel.swift */,
 				491687C7248F81EA008716D1 /* Mappings */,
+				499B9C00270DCC05006DE6C2 /* URIShapeResolver.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -199,6 +225,7 @@
 				491ECBF62431D3ED00799B2D /* Rendering */,
 				49E248122475169F0052E426 /* ToolPalette.swift */,
 				49DE4C88247EE56A0074F457 /* MathUtils.swift */,
+				496FD8EE26C40CE0002FB980 /* Utils.swift */,
 				494D96BF2427B0E0008C2FBC /* AppDelegate.swift */,
 				494D96C12427B0E0008C2FBC /* SceneDelegate.swift */,
 				495E8EFD249765FC009CAA1D /* WelcomeScreenViewController.swift */,
@@ -263,6 +290,7 @@
 		49FF65D025013FD800AD0F1E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				494836B12719A4300065C737 /* WacomInk.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -277,6 +305,7 @@
 				494D96B82427B0E0008C2FBC /* Sources */,
 				494D96B92427B0E0008C2FBC /* Frameworks */,
 				494D96BA2427B0E0008C2FBC /* Resources */,
+				49F0AED9271977F200A205DB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -356,9 +385,11 @@
 				494D96C02427B0E0008C2FBC /* AppDelegate.swift in Sources */,
 				494D96E42427FEA0008C2FBC /* InkBuilder.swift in Sources */,
 				491687CC248F81EA008716D1 /* UIDocumentPickerSaveModel.swift in Sources */,
+				499B9C01270DCC05006DE6C2 /* URIShapeResolver.swift in Sources */,
 				49E248132475169F0052E426 /* ToolPalette.swift in Sources */,
 				494D96DC2427FE51008C2FBC /* RasterBrushModel.swift in Sources */,
 				491687CB248F81EA008716D1 /* SerializationQuartz2DModel.swift in Sources */,
+				496FD8EF26C40CE0002FB980 /* Utils.swift in Sources */,
 				491687DA248F8594008716D1 /* InkStrokeImpl.swift in Sources */,
 				491687D4248F81EA008716D1 /* UIDocumentPickerControllerExtension.swift in Sources */,
 				491687D2248F81EA008716D1 /* InkModelToApplicationModel.swift in Sources */,
@@ -379,6 +410,7 @@
 				49664D2024AF753C009AF761 /* UIDocumentPickerSaveModel.swift in Sources */,
 				49B9E24324B5DD200092054D /* VectorBrushFactory.swift in Sources */,
 				494D96DE2427FE6B008C2FBC /* RedrawController.swift in Sources */,
+				49D8BE2727035AC00076BEF0 /* PDFExporter.swift in Sources */,
 				491687CE248F81EA008716D1 /* DoubleLinkedList.swift in Sources */,
 				49B8305B246D6A7C00E8079F /* VectorBrushModel.swift in Sources */,
 				49B8305F246D6AE500E8079F /* VectorInkBuilder.swift in Sources */,
@@ -543,7 +575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wacom.will3sample;
 				PRODUCT_NAME = "WILL 3 Sample";
 				SUPPORTS_MACCATALYST = NO;
@@ -573,7 +605,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wacom.will3sample;
 				PRODUCT_NAME = "WILL 3 Sample";
 				SUPPORTS_MACCATALYST = NO;

@@ -78,11 +78,13 @@ class VectorBrushModel: RenderingModel {
             polygons = (ink! as! VectorInkBuilder).polygonSimplifier.allData!
         }
         
-        if let bezierPath = generateBezierPolys(polygons)
-        {
+        var bezierPath: UIBezierPath?
+        generateBezierPolys(polygons, result: &bezierPath)
+        
+        if let bezierPath = bezierPath {
             return DryStroke(vectorPath: bezierPath, color: inkColor)
         }
-        
+                
         return nil
     }
     
@@ -102,21 +104,33 @@ class VectorBrushModel: RenderingModel {
         }
     }
     
-    override func drawingAddedPath(renderingContext: RenderingContext) {
-        drawStrokeResult = renderingContext.fillPolygon(addedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
-        predictedRect = renderingContext.measurePolygonBounds(polygon: predictedPath)
+    override func drawingAddedPath(renderingContext: RenderingContext) throws {
+        do {
+            drawStrokeResult = try renderingContext.fillPolygon(addedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
+            predictedRect = renderingContext.measurePolygonBounds(polygon: predictedPath)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
     override func drawingPredictedPath(at: RenderingContext) {
-        if preliminary == nil {
-            _ = at.fillPolygon(predictedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
-        }
-        else {
-            _ = at.fillPolygon(predictedPath ?? UIBezierPath(), preliminary!, blendMode: self.blendMode)
+        do {
+            if preliminary == nil {
+                _ = try at.fillPolygon(predictedPath ?? UIBezierPath(), inkColor, blendMode: self.blendMode)
+            }
+            else {
+                _ = try at.fillPolygon(predictedPath ?? UIBezierPath(), preliminary!, blendMode: self.blendMode)
+            }
+        } catch let error {
+            print("ERROR: \(error)")
         }
     }
     
     override func renderDryStroke(_ renderingContext: RenderingContext, dryStroke: DryStroke) {
-        _ = renderingContext.fillPolygon(dryStroke.vectorPath, dryStroke.color!, blendMode: self.blendMode)
+        do {
+            _ = try renderingContext.fillPolygon(dryStroke.vectorPath, dryStroke.color!, blendMode: self.blendMode)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
 }

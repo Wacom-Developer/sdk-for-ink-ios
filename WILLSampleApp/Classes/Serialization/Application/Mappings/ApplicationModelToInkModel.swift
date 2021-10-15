@@ -9,60 +9,59 @@
 import WacomInk
 
 extension ApplicationModel {
-    var inkModel: InkModel {
+    func getInkModel() throws -> InkModel {
         let resultInkModel: InkModel = InkModel()
         
         for device in devices.values {
-            resultInkModel.inputConfiguration.devices.add(inputItem: device)
+            try resultInkModel.inputConfiguration.devices.add(item: device)
         }
         
         for environment in environments.values {
-            resultInkModel.inputConfiguration.environments.add(inputItem: environment)
+            try resultInkModel.inputConfiguration.environments.add(item: environment)
         }
         
         for inkInputProvider in inkInputProviders.values {
-            resultInkModel.inputConfiguration.inkInputProviders.add(inputItem: inkInputProvider)
+            try resultInkModel.inputConfiguration.inkInputProviders.add(item: inkInputProvider)
         }
         
         for inputContext in inputContexts.values {
-            resultInkModel.inputConfiguration.inputContexts.add(inputItem: inputContext)
+            try resultInkModel.inputConfiguration.inputContexts.add(item: inputContext)
         }
         
         for sensorContext in sensorContexts.values {
-            resultInkModel.inputConfiguration.sensorContexts.add(inputItem: sensorContext)
+            try resultInkModel.inputConfiguration.sensorContexts.add(item: sensorContext)
         }
         
-        resultInkModel.inkTree.root = StrokeGroupNode(id: Identifier.fromNewUUID())
+        try resultInkModel.inkTree.setRoot(newValue: StrokeGroupNode(id: Identifier.fromNewUUID()!))
         if let applicationStrokes = strokes.values {
             for applicationStroke in applicationStrokes {
                 let vectorBrush = applicationStroke.inkStroke.getSerializationVectorBrush();
-        
+                
                 if resultInkModel.brushes.tryGetBrush(brushName: vectorBrush.name) == nil {
-                    resultInkModel.brushes.addVectorBrush(vectorBrush: vectorBrush);
+                    try resultInkModel.brushes.addVectorBrush(vectorBrush: vectorBrush);
                 }
-        
+                
                 let style = applicationStroke.inkStroke.getSerializationStyle(brushName: vectorBrush.name);
                 
                 let stroke = Stroke(
-                    Identifier.fromNewUUID(),
+                    Identifier.fromNewUUID()!,
                     applicationStroke.inkStroke.spline,
                     style,
-                    applicationStroke.inkStroke.layout,
-                    applicationStroke.sensorDataId ?? Identifier.empty,
+                    applicationStroke.sensorDataId,  //?? Identifier.empty,
                     sensorDataOffset: applicationStroke.inkStroke.sensorDataOffset,
                     sensorDataMappings: applicationStroke.inkStroke.sensorDataMappings
                 )
-                    
-        
-                let strokeNode = StrokeNode(Identifier.fromNewUUID(), stroke);
-                _ = resultInkModel.inkTree.root!.add(node: strokeNode);
+                
+                
+                let strokeNode = try StrokeNode(stroke)// Fix using strokeFragment test)//Identifier.fromNewUUID(), stroke);
+                _ = try resultInkModel.inkTree.root!.childNodes.add(node: strokeNode);
                 if let sensorDataIdentifier = applicationStroke.sensorDataId {
                     let sensorData = sensorDataMaps[sensorDataIdentifier]!
                     
-                    printSensorMappingsInfo(for: stroke)
+                    try printSensorMappingsInfo(for: stroke)
                     
                     if !resultInkModel.sensorDataRepository.containsId(id: sensorData.id) {
-                        resultInkModel.sensorDataRepository.add(sensorData: sensorData)
+                        try resultInkModel.sensorDataRepository.add(sensorData: sensorData)
                     }
                 }
             }
@@ -71,21 +70,23 @@ extension ApplicationModel {
         return resultInkModel
     }
     
-    func printSensorMappingsInfo(for stroke: Stroke, skip: Bool = true) {
+    func printSensorMappingsInfo(for stroke: Stroke, skip: Bool = true) throws {
         if skip { return }
         
-        assert(stroke.sensorDataId !=  Identifier.empty, "No sensorDataId for stroke \(stroke.id)")
+        if stroke.sensorDataId == nil {
+            throw "No sensorDataId for stroke \(stroke.id)"
+        }
         
-        let sensorData = sensorDataMaps[stroke.sensorDataId]!
+        let sensorData = sensorDataMaps[stroke.sensorDataId!]!
         let sensorContext = sensorContexts[inputContexts[sensorData.inputContextID]!.sensorContextId]
         let xChannel = sensorContext!.defaultSensorChannelsContext!.getChannel(typeUri: InkSensorType.x)!
         let yChannel = sensorContext!.defaultSensorChannelsContext!.getChannel(typeUri: InkSensorType.y)!
         
         let sensorChannelXData = sensorData.allChannelData[xChannel.id]!.map({ covertToFloat($0, Float(xChannel.precision))})
         let sensorChannelYData = sensorData.allChannelData[yChannel.id]!.map({ covertToFloat($0, Float(yChannel.precision))})
-        
-        let strokeXData = stroke.getCoordsList(property: PathPoint.Property.x)
-        let strokeYData = stroke.getCoordsList(property: PathPoint.Property.y)
+        let layout = try PathPointLayout(layoutMask: stroke.getSpline().layoutMask)
+        let strokeXData = try stroke.getCoordsList(property: PathPoint.Property.x, layout: layout)!
+        let strokeYData = try stroke.getCoordsList(property: PathPoint.Property.y, layout: layout)!
         let strokeDataCount = strokeXData.count
         
         let sensorDataOffset = Int(stroke.sensorDataOffset)

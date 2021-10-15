@@ -13,8 +13,13 @@ class RasterInkBuilder: InkBuilder {
         super.init(collectPointData: collectPointData)
         self.pathPointLayout = pathLayout ?? InkBuilder.defaultPointLayout
         self.smoother = SmoothingFilter(dimsCount: self.pathPointLayout.count)
-        self.splineProducer = SplineProducer(pathPointLayout: self.pathPointLayout)
-        self.splineInterpolator = DistanceBasedInterpolator(inputLayout: self.pathPointLayout, spacing: 0.2, splitCount: 8, interpolatedByLength: true, calculateDerivatives: true, keepAllData: true)
+        self.splineProducer = SplineProducer(layout: self.pathPointLayout)
+        
+        do {
+            self.splineInterpolator = try DistanceBasedInterpolator(inputLayout: self.pathPointLayout, spacing: 0.2, splitCount: 8, interpolatedByLength: true, calculateDerivatives: true, keepAllData: true)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         self.calculatePathPointForPen = { previous, current, next in
             let size: Float = 5.0
@@ -59,29 +64,39 @@ class RasterInkBuilder: InkBuilder {
     }
     
     func updatePipeline(layout: PathPointLayout, calculator: @escaping Calculator, spacing: Float) {
-        pathPointLayout = layout
-        
-        pathProducer = PathProducer(layout, calculator)
-        
-        smoother = SmoothingFilter(dimsCount: layout.count)
-         
-        splineProducer = SplineProducer(pathPointLayout: layout, keepAllData: true)
-        
-        splineInterpolator = DistanceBasedInterpolator(inputLayout: layout, spacing: spacing, splitCount: 8, interpolatedByLength: true, calculateDerivatives: true, keepAllData: true)
-        
-        (splineInterpolator as! DistanceBasedInterpolator).spacing = spacing
+        do {
+            pathPointLayout = layout
+            
+            pathProducer = try PathProducer(layout, calculator)
+            
+            smoother = SmoothingFilter(dimsCount: layout.count)
+             
+            splineProducer = SplineProducer(layout: layout, keepAllData: true)
+            
+            splineInterpolator = try DistanceBasedInterpolator(inputLayout: layout, spacing: spacing, splitCount: 8, interpolatedByLength: true, calculateDerivatives: true, keepAllData: true)
+            
+            (splineInterpolator as! DistanceBasedInterpolator).spacing = spacing
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
     func getPath() -> ([Float]?, [Float]?) {
-        let (smoothAddedGeometry, smoothPredictedGeometry) = smoother!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: m_pathSegment.accumulateAddition, prediction: m_pathSegment.lastPrediction)
+        do {
+            let (smoothAddedGeometry, smoothPredictedGeometry) = try smoother!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: m_pathSegment.accumulateAddition, prediction: m_pathSegment.lastPrediction)
+            
+            let (addedSpline, predictedSpline) = try splineProducer!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: smoothAddedGeometry, prediction: smoothPredictedGeometry)
+            
+            let (addedPath, predictedPath) = try splineInterpolator!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: addedSpline, prediction: predictedSpline)
+            
+            resetSegment()
+            
+            return (addedPath, predictedPath)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
-        let (addedSpline, predictedSpline) = splineProducer!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: smoothAddedGeometry, prediction: smoothPredictedGeometry)
-        
-        let (addedPath, predictedPath) = splineInterpolator!.add(isFirst: m_pathSegment.isFirst, isLast: m_pathSegment.isLast, addition: addedSpline, prediction: predictedSpline)
-        
-        resetSegment()
-        
-        return (addedPath, predictedPath)
+        return (nil, nil)
     }
     
     public override func setDefaultStrokeSize(defaultSize: Float) {

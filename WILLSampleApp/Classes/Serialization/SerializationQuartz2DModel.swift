@@ -35,7 +35,7 @@ class SerializationQuartz2DModel {
     var selectOverlapMode: Manipulator.OverlapMode = Manipulator.OverlapMode.noOverlap
     
     private var canvas = CAShapeLayer()
-    private var path: UIBezierPath = UIBezierPath()
+    private var path: UIBezierPath?
     private var selectCanvas = CAShapeLayer()
     var selectedSpline: Spline? = nil
     private var selectedContour: DIPolygon? = nil
@@ -163,7 +163,7 @@ class SerializationQuartz2DModel {
     func rotateEnded(_ sender: UIRotationGestureRecognizer) {
         if selectedManipulationAction == ManipulationAction.rotate {
             updateRotatePerFrame(sender)
-            update(rotateAffineTransformByAngle(accumulateRotation), rotate: true)
+            try! update(rotateAffineTransformByAngle(accumulateRotation), rotate: true)
         }
     }
     
@@ -183,7 +183,7 @@ class SerializationQuartz2DModel {
             } else {
                 clearSelectCanvas(saveStrokeIndexes: true)
                 selectCanvas = view.layer.bounds.createCanvas()
-                selectCanvas.path = path.cgPath
+                selectCanvas.path = path?.cgPath ?? UIBezierPath().cgPath
                 selectCanvas.fillColor = UIColor.clear.cgColor
                 selectCanvas.strokeColor = UIColor.black.cgColor
                 selectCanvas.lineWidth = 2
@@ -201,7 +201,7 @@ class SerializationQuartz2DModel {
             }
             
             canvas = view.layer.bounds.createCanvas()
-            canvas.path = path.cgPath
+            canvas.path = path?.cgPath ?? UIBezierPath().cgPath
             canvas.fillColor = selectedManipulationType == ManipulationType.intersect ? backgroundColor.cgColor : inkColor.cgColor
             view.layer.addSublayer(canvas)
         }
@@ -250,7 +250,7 @@ class SerializationQuartz2DModel {
         } else {
             if(hasSelection) {
                 if selectedManipulationAction == ManipulationAction.move {
-                    update(CGAffineTransform(translationX: translateX!, y: translateY!))
+                    try! update(CGAffineTransform(translationX: translateX!, y: translateY!))
                 }
             } else {
                 selectedSpline = selectingInkBuilder.splineProducer!.allData
@@ -272,22 +272,34 @@ class SerializationQuartz2DModel {
             
             selectedStrokeIndexes = []
             if selectedManipulatorCollectionType == ManipulatorCollectionType.bySimplifiedPolygon {
-                manipulator!.select(points: selectedContour!, integrityMode, selectOverlapMode, isBezierCached: isBezierCached, onStrokeSelected: { resultStroke -> () in
-                    self.onStrokeSelected(resultStroke, view: view)
-                })
+                do {
+                    try manipulator!.select(points: selectedContour!, integrityMode, selectOverlapMode, isBezierCached: isBezierCached, onStrokeSelected: { resultStroke -> () in
+                        self.onStrokeSelected(resultStroke, view: view)
+                    })
+                } catch let error {
+                    print("ERROR: \(error)")
+                }
             }
             else {
-                manipulator!.select(spline: selectedSpline!, selectingInkBuilder.pathPointLayout, isBezierCached: isBezierCached, integrityMode, selectOverlapMode, onStrokeSelected: { resultStroke -> () in
-                    self.onStrokeSelected(resultStroke, view: view)
-                })
+                do {
+                    try manipulator!.select(spline: selectedSpline!, selectingInkBuilder.pathPointLayout, isBezierCached: isBezierCached, integrityMode, selectOverlapMode, onStrokeSelected: { resultStroke -> () in
+                        self.onStrokeSelected(resultStroke, view: view)
+                    })
+                } catch let error {
+                    print("ERROR: \(error)")
+                }
             }
             
             return true
         }
     }
     
-    func save(_ url: URL) {
-        applicationModel.write(to: url)
+    func save(_ url: URL) throws {
+        try applicationModel.write(to: url)
+    }
+    
+    func savePDF(_ url: URL) throws {
+        try applicationModel.writePDF(to: url)
     }
     
     func hasRasterInk(url: URL) -> Bool {
@@ -298,14 +310,11 @@ class SerializationQuartz2DModel {
         return applicationModel.hasVectorInk(url: url)
     }
     
-    func load(url: URL, viewLayer: CALayer) {
+    func load(url: URL, viewLayer: CALayer) throws {
         if let loadedApplicationModel = applicationModel.read(from: url), let addedApplicationStrokes = loadedApplicationModel.strokes.values {
             resetApplicationModel(by: loadedApplicationModel)
-            addCanvasesAndRTreeFor(applicationStrokes: addedApplicationStrokes,in: viewLayer)
-            //applicationModel = loadedApplicationModel // Fix use local environment and device .appendModel(applicationModel)
+            try addCanvasesAndRTreeFor(applicationStrokes: addedApplicationStrokes,in: viewLayer)
         }
-        
-        //print("viewLayer.sublayers?.count \(viewLayer.sublayers?.count)")
     }
     
     func updatePipelineForSelectedTool(inputType: UITouch.TouchType) {
@@ -360,33 +369,47 @@ class SerializationQuartz2DModel {
         applicationModel = resetModel //ApplicationModel(by: resetModel) // Fix memory //ApplicationModel(applicationModel)
     }
     
-    private func addCanvasesAndRTreeFor(applicationStrokes: [ApplicationStroke],in viewLayer: CALayer) {
+    private func addCanvasesAndRTreeFor(applicationStrokes: [ApplicationStroke],in viewLayer: CALayer) throws {
         for appStroke in applicationStrokes {
-            initReconstructInkBuilder(appStroke.inkStroke)
-            
-            if isBezierCached {
-                uiBezierPathCache?.updateBezierPathCache(spline: appStroke.inkStroke.spline, cacheProtocol: recostructInkBilder!)
+            if appStroke.inkStroke.spline.path.count > 0 {
+                try initReconstructInkBuilder(appStroke.inkStroke)
+                
+                if isBezierCached {
+                    try uiBezierPathCache?.updateBezierPathCache(spline: appStroke.inkStroke.spline, cacheProtocol: recostructInkBilder!)
+                }
+                
+                let strokeIndex = try manipulator!.add(stroke: appStroke.inkStroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil)
+                
+                if strokeIndex != appStroke.inkStroke.id {
+                    
+                    throw "Stroke index should be equal to stroke index in manipulation context."
+                }
+                
+                if let canvas = getCanvas(by: appStroke.inkStroke, viewLayer: viewLayer) {
+                    appStroke.canvas = canvas
+                }
+                
+                //appStroke.canvas = getCanvas(by: appStroke.inkStroke, viewLayer: viewLayer)
             }
-            
-            let strokeIndex = manipulator!.add(stroke: appStroke.inkStroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil)
-            assert(strokeIndex == appStroke.inkStroke.id, "Stroke index should be equal to stroke index in manipulation context.")
-            appStroke.canvas = getCanvas(by: appStroke.inkStroke, viewLayer: viewLayer)
         }
     }
     
-    private func getCanvas(by inkStroke: Quartz2D.InkStroke, viewLayer: CALayer) -> CAShapeLayer {
-        let canvas = viewLayer.bounds.createCanvas()
-        canvas.path = recostructInkBilder!.getBezierPathBy(spline: inkStroke.spline)!.cgPath
-        canvas.fillColor = UIColor(red: CGFloat(inkStroke.constants.red), green: CGFloat(inkStroke.constants.green), blue: CGFloat(inkStroke.constants.blue), alpha: CGFloat(inkStroke.constants.alpha)).cgColor //inkStroke.constants.color.cgColor
-        viewLayer.addSublayer(canvas)
-        
-        return canvas
+    private func getCanvas(by inkStroke: Quartz2D.InkStroke, viewLayer: CALayer) -> CAShapeLayer? {
+        if let path = recostructInkBilder!.getBezierPathBy(spline: inkStroke.spline) {
+            let canvas = viewLayer.bounds.createCanvas()
+            canvas.path = path.cgPath
+            canvas.fillColor = UIColor(red: CGFloat(inkStroke.constants.red), green: CGFloat(inkStroke.constants.green), blue: CGFloat(inkStroke.constants.blue), alpha: CGFloat(inkStroke.constants.alpha)).cgColor //inkStroke.constants.color.cgColor
+            viewLayer.addSublayer(canvas)
+            return canvas
+        } else {
+            return nil
+        }
     }
     
     private func onEndSelect() {
-        let indexX = selectingInkBuilder.splineInterpolator!.interpolatedSplineLayout.IndexOf(property: .x)!
-        let indexY = selectingInkBuilder.splineInterpolator!.interpolatedSplineLayout.IndexOf(property: .y)!
-        let stride = selectingInkBuilder.splineProducer!.dimsCount
+        let indexX = selectingInkBuilder.splineInterpolator!.interpolatedSplineLayout!.indexOf(property: .x)!
+        let indexY = selectingInkBuilder.splineInterpolator!.interpolatedSplineLayout!.indexOf(property: .y)!
+        let stride = try! selectingInkBuilder.splineProducer!.getDimsCount()
         var offsetIndex = 0
         assert(selectedSpline!.path.count % stride == 0)
         let steps = selectedSpline!.path.count / stride
@@ -404,8 +427,9 @@ class SerializationQuartz2DModel {
             }
             
             selectContourCenter = (CGFloat(sumX / Float(steps)), CGFloat(sumY / Float(steps)))
-            path = generateBezierPolys([selectedContour!])!
-            selectCanvas.path = (path.copy() as! UIBezierPath).cgPath
+            generateBezierPolys([selectedContour!], result: &path)
+            //path = generateBezierPolys([selectedContour!])!
+            selectCanvas.path = (path?.copy() as! UIBezierPath).cgPath
         }
     }
     
@@ -434,7 +458,7 @@ class SerializationQuartz2DModel {
             
             if selectedManipulationType == ManipulationType.draw {
                 if isBezierCached {
-                    uiBezierPathCache!.addBezierPathCache(for: addedPath, controlPointsCount: currentInkBuilder!.splineProducer!.allData.path.count / currentInkBuilder!.splineProducer!.dimsCount)
+                    uiBezierPathCache!.addBezierPathCache(for: addedPath, controlPointsCount: currentInkBuilder!.splineProducer!.allData!.path.count / (try! currentInkBuilder!.splineProducer!.getDimsCount()))
                 }
             }
             
@@ -444,8 +468,8 @@ class SerializationQuartz2DModel {
             
             if selectedManipulationType == ManipulationType.intersect {
                 if selectedManipulatorCollectionType == ManipulatorCollectionType.bySimplifiedPolygon {
-                    if let points = intersectingInkBuilder.polygonSimplifier.allData.last {
-                        manipulator!.intersect(points, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: { resultStroke -> () in
+                    if let points = intersectingInkBuilder.polygonSimplifier.allData?.last {
+                        try! manipulator!.intersect(points, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: { resultStroke -> () in
                             self.onIntersectStroke(resultStroke, view: view)
                         })
                     }
@@ -453,26 +477,28 @@ class SerializationQuartz2DModel {
                 else {
                     if let spline = intersectingInkBuilder.addedSpline {
                         let erasedStroke = Quartz2D.InkStroke(
-                            identifier: Identifier.fromNewUUID(),
+                            identifier: Identifier.fromNewUUID()!,
                             spline: spline,
                             layout: intersectingInkBuilder.pathPointLayout,
-                            vectorBrush: intersectingInkBuilder.brushApplier.prototype,
+                            vectorBrush: try! intersectingInkBuilder.brushApplier.getPrototype(),
                             constants: Quartz2D.ConstantAttributes(
                                 size: intersectingInkBuilder.brushApplier.defaultSize,
                                 rotation: intersectingInkBuilder.brushApplier.defaultRotation,
                                 scale: intersectingInkBuilder.brushApplier.defaultScale,
-                                offset: intersectingInkBuilder.brushApplier.defaultOffset)
+                                offset: intersectingInkBuilder.brushApplier.defaultOffset),
+                            brushName: intersectingInkBuilder.brushName,
+                            tool: ToolPalette.shared.selectedVectorTool
                         ) //InkStrokeProtocol
-                        manipulator!.intersect(stroke: erasedStroke, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: { resultStroke -> () in
+                        try! manipulator!.intersect(stroke: erasedStroke, isBezierCached: isBezierCached, integrityMode, onStrokeSelected: { resultStroke -> () in
                             self.onIntersectStroke(resultStroke, view: view)
                         })  //.intersect (spline: spline, isBezierCached: isBezierCached, integrityMode, intersectBrushApplier: intersectingInkBuilder.brushApplier, )
                     }
                 }
             }
             
-            path.append(addedPath!)
+            path?.append(addedPath!)
             
-            let copyPath: UIBezierPath? = path.copy() as? UIBezierPath
+            let copyPath: UIBezierPath? = path?.copy() as? UIBezierPath
             if selectedManipulationType == ManipulationType.select {
                 if !hasSelection {
                     selectCanvas.path = copyPath?.cgPath
@@ -508,7 +534,7 @@ class SerializationQuartz2DModel {
         applyTransformationToView(rotateAffineTransformByAngle(dRotation))
     }
     
-    private func update(_ affineTransform: CGAffineTransform, rotate: Bool = false) {
+    private func update(_ affineTransform: CGAffineTransform, rotate: Bool = false) throws {
         let transform = AffineTransform()
         transform.set(affineTransform)
         let newSelectedContourCenter = transform.matrix! * DIFloat4(
@@ -521,14 +547,14 @@ class SerializationQuartz2DModel {
         
         for selectedStrokeIndex in selectedStrokeIndexes {
             let applicationStroke = applicationModel.findStroke(by: selectedStrokeIndex) //serializationModel.dryStrokes[selectedStrokeIndex]
-            let allDataSpline = Spline(layoutMask: applicationStroke!.inkStroke.spline.layoutMask, path: applicationStroke!.inkStroke.spline.path, tStart: applicationStroke!.inkStroke.spline.tStart, tFinal: applicationStroke!.inkStroke.spline.tFinal)
+            let allDataSpline = try Spline(layoutMask: applicationStroke!.inkStroke.spline.layoutMask, path: applicationStroke!.inkStroke.spline.path, tStart: applicationStroke!.inkStroke.spline.tStart, tFinal: applicationStroke!.inkStroke.spline.tFinal)
             
             let layout = applicationStroke!.inkStroke.layout //.splineLayout
             let stride = layout.count //dryStroke!.stroke.stride
             // start transform
-            let indexX = layout.IndexOf(property: .x)!
-            let indexY = layout.IndexOf(property: .y)!
-            let indexRotation = layout.IndexOf(property: .rotation)
+            let indexX = layout.indexOf(property: .x)!
+            let indexY = layout.indexOf(property: .y)!
+            let indexRotation = layout.indexOf(property: .rotation)
             //let stride = drawingInkBuilder.splineProducer!.dimsCount
             var offsetIndex = 0
             assert(allDataSpline.path.count % stride == 0)
@@ -550,7 +576,7 @@ class SerializationQuartz2DModel {
                     offsetIndex = offsetIndex + stride
                 }
                 
-                let spline = Spline(layoutMask: allDataSpline.layoutMask, path: allDataSpline.path, tStart: allDataSpline.tStart, tFinal: allDataSpline.tFinal)
+                let spline = try Spline(layoutMask: allDataSpline.layoutMask, path: allDataSpline.path, tStart: allDataSpline.tStart, tFinal: allDataSpline.tFinal)
                 
                 if rotate && indexRotation == nil {
                     let constants: Quartz2D.ConstantAttributes = applicationStroke!.inkStroke.constants as! Quartz2D.ConstantAttributes
@@ -558,7 +584,7 @@ class SerializationQuartz2DModel {
                     applicationStroke!.inkStroke.constants = constants//Quartz2D.ConstantAttributes()
                 }
                 
-                initReconstructInkBuilder(applicationStroke!.inkStroke)
+                try initReconstructInkBuilder(applicationStroke!.inkStroke)
                 
                 if let addedBezier = recostructInkBilder!.getBezierPathBy(spline: allDataSpline) {
                     if !addedBezier.isEmpty {
@@ -569,10 +595,10 @@ class SerializationQuartz2DModel {
                 applicationStroke!.inkStroke.spline = spline
                 
                 if isBezierCached {
-                    uiBezierPathCache!.updateBezierPathCache(spline: applicationStroke!.inkStroke.spline, cacheProtocol: recostructInkBilder!)
-                    manipulator!.update(stroke: applicationStroke!.inkStroke, editStrokeIndex: selectedStrokeIndex, bezierCache: uiBezierPathCache!)
+                    try uiBezierPathCache!.updateBezierPathCache(spline: applicationStroke!.inkStroke.spline, cacheProtocol: recostructInkBilder!)
+                    try manipulator!.update(stroke: applicationStroke!.inkStroke, editStrokeIndex: selectedStrokeIndex, bezierCache: uiBezierPathCache!)
                 } else {
-                    manipulator!.update(stroke: applicationStroke!.inkStroke, editStrokeIndex: selectedStrokeIndex)
+                    try manipulator!.update(stroke: applicationStroke!.inkStroke, editStrokeIndex: selectedStrokeIndex)
                 }
             }
         }
@@ -581,20 +607,22 @@ class SerializationQuartz2DModel {
     private func storeCurrentStroke(_ touchType: UITouch.TouchType) {//,_ spline: Spline) {
         if let allDataSpline = drawingInkBuilder.splineProducer!.allData {
             let stroke = Quartz2D.InkStroke(
-                identifier: Identifier.fromNewUUID(),
+                identifier: Identifier.fromNewUUID()!,
                 spline: allDataSpline.copy() as! Spline,
                 layout: drawingInkBuilder.pathPointLayout,
-                vectorBrush: drawingInkBuilder.brushApplier.prototype,
+                vectorBrush: try! drawingInkBuilder.brushApplier.getPrototype(),
                 constants: Quartz2D.ConstantAttributes(
                     size: drawingInkBuilder.brushApplier.defaultSize,
                     rotation: drawingInkBuilder.brushApplier.defaultRotation,
                     scale: drawingInkBuilder.brushApplier.defaultScale,
                     offset: drawingInkBuilder.brushApplier.defaultOffset,
                     colorRGBA: UIColor(cgColor: canvas.fillColor!).rgba
-                )
+                ),
+                brushName: drawingInkBuilder.brushName,
+                tool: ToolPalette.shared.selectedVectorTool
             )
             
-            let strokeIndex = manipulator!.add(stroke: stroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil)
+            let strokeIndex = try! manipulator!.add(stroke: stroke, bezierCache:  isBezierCached ? uiBezierPathCache! : nil)
             assert(strokeIndex == stroke.id, "Stroke index should be equal to stroke index in manipulation context.")
             
             applicationModel.addStroke(ApplicationStroke(canvas: canvas, inkStroke: stroke, touchType: touchType), sensorPointerData: drawingInkBuilder.getPointerDataList())
@@ -656,7 +684,7 @@ class SerializationQuartz2DModel {
     private func addResultStrokes(_ strokes: [WacomInk.ResultManipulatedStroke.ResultStroke],_ view: UIView,_ fillColor: CGColor?,_ canvasIndex: Int?, isSelected: Bool = false,_ originalStroke: ApplicationStroke) {
         for resultStroke in strokes {
             let stroke = resultStroke.stroke
-            initReconstructInkBuilder(stroke)
+            try! initReconstructInkBuilder(stroke)
             
             var addedBezier: UIBezierPath?
             if isBezierCached == true {
@@ -699,13 +727,13 @@ class SerializationQuartz2DModel {
     
     private func removeStrokesFromContext(_ resultStrokes: [WacomInk.ResultManipulatedStroke.ResultStroke]) {
         for resultStroke in resultStrokes {
-            manipulator!.spatialContext!.remove(inkStrokeId: resultStroke.stroke.id)
+            try! manipulator!.spatialContext!.remove(inkStrokeId: resultStroke.stroke.id)
         }
     }
     
-    private func initReconstructInkBuilder(_ stroke: InkStrokeProtocol) {
-        if recostructInkBilder == nil || (
-            recostructInkBilder!.brushApplier.prototype != stroke.vectorBrush ||
+    private func initReconstructInkBuilder(_ stroke: InkStrokeProtocol) throws {
+        if try recostructInkBilder == nil || (
+            try recostructInkBilder!.brushApplier.getPrototype() != stroke.vectorBrush ||
                 recostructInkBilder!.brushApplier.defaultSize != stroke.constants.size ||
                 recostructInkBilder!.brushApplier.defaultRotation != stroke.constants.rotation ||
                 recostructInkBilder!.brushApplier.defaultScale.x != stroke.constants.scaleX ||
@@ -714,7 +742,7 @@ class SerializationQuartz2DModel {
                 recostructInkBilder!.brushApplier.defaultOffset.x != stroke.constants.offsetX ||
                 recostructInkBilder!.brushApplier.defaultOffset.y != stroke.constants.offsetY ||
                 recostructInkBilder!.brushApplier.defaultOffset.z != stroke.constants.offsetZ ||
-                recostructInkBilder!.pathPointLayout != stroke.layout
+                recostructInkBilder!.layout != stroke.layout
             ) {
             recostructInkBilder = ManipulationVectorInkBuilder(
                 collectPointData: true,
@@ -728,47 +756,37 @@ class SerializationQuartz2DModel {
         }
     }
     
-    private func setDrawingInkBuilder() {
-        var index = 1 //Int.random(in: 0...1)
-        drawingInkBuilder = [ManipulationVectorInkBuilder(collectPointData: true, keepSplineProducerAllData: true), ManipulationVectorInkBuilder(collectPointData: true, PathPointLayout([.x, .y, .rotation]), keepSplineProducerAllData: true)] [index]
+    private func setDrawingInkBuilder() throws {
+        drawingInkBuilder = ManipulationVectorInkBuilder(collectPointData: true, PathPointLayout([.x, .y, .rotation]), keepSplineProducerAllData: true)
         
-        index = 1
-        drawingInkBuilder.brushApplier = [
-            BrushApplier(layout: drawingInkBuilder.pathPointLayout, prototype: BrushApplier.createUnitCirclePolygon(verticesCount: Int.random(in: 4...12))),
-            BrushApplier(
-                layout: drawingInkBuilder.pathPointLayout,
-                brush: Geometry.VectorBrush(polygons: [
-                    BrushPolygon(
-                        minScale: 0,
-                        points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)
-                    ),
-                    BrushPolygon(
-                        minScale: 20,
-                        points: BrushApplier.createUnitCirclePolygon(verticesCount: 6)
-                    ),
-                    BrushPolygon(
-                        minScale: 45,
-                        points: BrushApplier.createUnitCirclePolygon(verticesCount: 9)
-                    ),
-                    BrushPolygon(
-                        minScale: 80,
-                        points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)
-                    )
-                    
-                ])
-            )
-            ] [index]
+        drawingInkBuilder.brushApplier = try BrushApplier(
+            layout: drawingInkBuilder.layout,
+            brush: try Geometry.VectorBrush(polygons: [
+                try BrushPolygon.createNormalized(
+                    minScale: 0,
+                    points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)
+                ),
+                try BrushPolygon.createNormalized(
+                    minScale: 20,
+                    points: BrushApplier.createUnitCirclePolygon(verticesCount: 6)
+                ),
+                try BrushPolygon.createNormalized(
+                    minScale: 45,
+                    points: BrushApplier.createUnitCirclePolygon(verticesCount: 9)
+                ),
+                try BrushPolygon.createNormalized(
+                    minScale: 80,
+                    points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)
+                )
+                
+            ])
+        )
         
-        if index == 1 {
-            //drawingInkBuilder.setDefault(size: testDefaultSize)
-            testDefaultSize = testDefaultSize + Float(Int.random(in: -1...4)) * 0.1
-            
-            let scaleX = Float(Int.random(in: 1...7))
-            print("ScaleX: \(scaleX)")
-            drawingInkBuilder.brushApplier.defaultScale = DIFloat3(scaleX, 1, 1)
-            drawingInkBuilder.brushApplier.defaultOffset = DIFloat3(50, 10 , 0)
-            drawingInkBuilder.brushApplier.defaultRotation = Float.pi * 0.3
-        }
+        testDefaultSize =  5 + Float(Int.random(in: -1...35)) * 0.1
+        drawingInkBuilder.setDefault(size: testDefaultSize)
+        drawingInkBuilder.brushApplier.defaultRotation = 0.6
+        drawingInkBuilder.brushApplier.defaultScale = DIFloat3(1.5, 0.5, 0.7)
+        drawingInkBuilder.brushApplier.defaultOffset = DIFloat3(-10.5, 8.75, -0.7)
         
         currentInkBuilder = drawingInkBuilder
     }

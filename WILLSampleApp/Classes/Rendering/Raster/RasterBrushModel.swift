@@ -28,8 +28,12 @@ class RasterBrushModel: RenderingModel {
         self.blendMode = blendMode
         self.particleBrush = particleBrush
         
-        addedParticleList = ParticleList(LayoutProperties: ink!.splineInterpolator!.layoutProperties)
-        predictedParticleList = ParticleList(LayoutProperties: ink!.splineInterpolator!.layoutProperties)
+        do {
+            addedParticleList = ParticleList(LayoutProperties: try ink!.splineInterpolator!.getInterpolatedSplineLayoutProperties())
+            predictedParticleList = ParticleList(LayoutProperties: try ink!.splineInterpolator!.getInterpolatedSplineLayoutProperties())
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         defaultSize = 3.0
     }
@@ -75,36 +79,53 @@ class RasterBrushModel: RenderingModel {
             
             if points.count > 0
             {
-                let particleList = ParticleList(LayoutProperties: ink!.splineInterpolator!.layoutProperties)
-                particleList.assign(path: points)
-                return DryStroke(particleList: particleList, randomSeed: Int64(startRandomSeed), strokeConstants: strokeConstants.copy() as! StrokeConstants)
+                do {
+                    let particleList = ParticleList(LayoutProperties: try ink!.splineInterpolator!.getInterpolatedSplineLayoutProperties())
+                    particleList.assign(path: points)
+                    return DryStroke(particleList: particleList, randomSeed: Int64(startRandomSeed), strokeConstants: strokeConstants.copy() as! StrokeConstants)
+                } catch let error {
+                    print("ERROR: \(error)")
+                }
             }
         }
+        
         return nil
     }
     
     override func initPath() {
-        let (addedSpline, predictedSpline) = (ink as! RasterInkBuilder).getPath()
-        
-        addedParticleList = ParticleList(LayoutProperties: ink!.splineInterpolator!.layoutProperties)
-        predictedParticleList = ParticleList(LayoutProperties: ink!.splineInterpolator!.layoutProperties)
+        do {
+            let (addedSpline, predictedSpline) = (ink as! RasterInkBuilder).getPath()
+            
+            addedParticleList = ParticleList(LayoutProperties: try ink!.splineInterpolator!.getInterpolatedSplineLayoutProperties())
+            predictedParticleList = ParticleList(LayoutProperties: try ink!.splineInterpolator!.getInterpolatedSplineLayoutProperties())
 
-        addedParticleList?.assign(path: addedSpline!)
-        predictedParticleList?.assign(path: predictedSpline!)
+            addedParticleList?.assign(path: addedSpline!)
+            predictedParticleList?.assign(path: predictedSpline!)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
-    override func drawingAddedPath(renderingContext: RenderingContext) {
-        drawStrokeResult = renderingContext.drawParticleStroke(particleBrush!, addedParticleList!, blendMode: blendMode, randomSeed: drawStrokeResult.randomGeneratedSeed, strokeConstants: strokeConstants)
-        
-        predictedRect = renderingContext.measureParticleStrokeBounds(particleList: predictedParticleList!, strokeConstants: strokeConstants, scattering: particleBrush!.scattering)
+    override func drawingAddedPath(renderingContext: RenderingContext) throws {
+        do {
+            drawStrokeResult = try renderingContext.drawParticleStroke(particleBrush!, addedParticleList!, blendMode: blendMode, randomSeed: drawStrokeResult.randomGeneratedSeed, strokeConstants: strokeConstants)
+            
+            predictedRect = renderingContext.measureParticleStrokeBounds(particleList: predictedParticleList!, strokeConstants: strokeConstants, scattering: particleBrush!.scattering)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
     
     override func drawingPredictedPath(at: RenderingContext) {
         if preliminary != nil {
             strokeConstants.color = preliminary!
         }
-
-        _ = at.drawParticleStroke(particleBrush!, predictedParticleList!, blendMode: blendMode, randomSeed: drawStrokeResult.randomGeneratedSeed, strokeConstants: strokeConstants)
+        
+        do {
+            _ = try at.drawParticleStroke(particleBrush!, predictedParticleList!, blendMode: blendMode, randomSeed: drawStrokeResult.randomGeneratedSeed, strokeConstants: strokeConstants)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
         
         if preliminary != nil {
             strokeConstants.color = backUpColor!
@@ -172,7 +193,11 @@ class RasterBrushModel: RenderingModel {
     }
     
     override func renderDryStroke(_ renderingContext: RenderingContext, dryStroke: DryStroke) {
-        _ = renderingContext.drawParticleStroke(particleBrush!, dryStroke.particleList!
-            , blendMode: blendMode, randomSeed: dryStroke.randomSeed, strokeConstants: dryStroke.strokeConstants!)
+        do {
+            _ = try renderingContext.drawParticleStroke(particleBrush!, dryStroke.particleList!
+                , blendMode: blendMode, randomSeed: dryStroke.randomSeed, strokeConstants: dryStroke.strokeConstants!)
+        } catch let error {
+            print("ERROR: \(error)")
+        }
     }
 }

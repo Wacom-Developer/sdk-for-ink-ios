@@ -29,13 +29,15 @@ class Quartz2D {
             }
             
             let resultStroke = InkStroke(
-                identifier: identifier,
+                identifier: identifier!,
                 spline: newSpline,
                 layout: originalStroke.layout,
                 vectorBrush: originalStroke.vectorBrush,
                 constants: originalStroke.constants as! Quartz2D.ConstantAttributes,
                 sensorDataOffset: originalStroke.sensorDataOffset + UInt32(firstPointIndex),
-                sensorDataMappings: newSplineSensorMappings
+                sensorDataMappings: newSplineSensorMappings,
+                brushName: "",
+                tool: ToolPalette.shared.selectedVectorTool
             )
             
             return resultStroke
@@ -103,6 +105,8 @@ class Quartz2D {
         public var vectorBrush: Geometry.VectorBrush
         public var sensorDataOffset: UInt32 = 0
         public var sensorDataMappings: [UInt32] = []
+        public var brushName: String
+        public var tool: VectorTool?
         
         public init(
             identifier: Identifier,
@@ -111,7 +115,9 @@ class Quartz2D {
             vectorBrush: Geometry.VectorBrush,
             constants: ConstantAttributes,
             sensorDataOffset: UInt32,
-            sensorDataMappings: [UInt32]
+            sensorDataMappings: [UInt32],
+            brushName: String,
+            tool: VectorTool?
         ) {
             self.id = identifier
             self.spline = spline
@@ -120,6 +126,8 @@ class Quartz2D {
             self.constants = constants
             self.sensorDataOffset = sensorDataOffset
             self.sensorDataMappings = sensorDataMappings
+            self.brushName = brushName
+            self.tool = tool
         }
         
         public init(
@@ -127,7 +135,9 @@ class Quartz2D {
             spline: Spline,
             layout: PathPointLayout,
             vectorBrush: Geometry.VectorBrush,
-            constants: ConstantAttributes
+            constants: ConstantAttributes,
+            brushName: String,
+            tool: VectorTool?
         ) {
             self.id = identifier
             self.spline = spline
@@ -136,8 +146,10 @@ class Quartz2D {
             self.constants = constants
             self.sensorDataOffset = 0 // Fix review
             self.sensorDataMappings = []
-            let pointsCount = self.spline.path.count / self.layout.count //- 2 // FIX, to be reviseds Remove first and last control points in spline
+            let pointsCount = self.layout.count == 0 ? 0 : self.spline.path.count / self.layout.count //- 2 // FIX, to be reviseds Remove first and last control points in spline
             self.sensorDataMappings.reserveCapacity(pointsCount)
+            self.brushName = brushName
+            self.tool = tool
             
             // One to one mapping of sensor data points to spline points
             for i in 0..<pointsCount {
@@ -148,26 +160,28 @@ class Quartz2D {
         
         public func getSerializationVectorBrush() -> VectorBrush {
             // TODO: the brush should be cached and only created when there is a change in the brush polygons
-            let brushName = getUniqueBrushName();
-            
-            return VectorBrush(name: brushName, brushPolygons: vectorBrush.polygons);
+            let name = URIBuilder.getBrushURI(type: "vector", name: brushName)
+                         
+            let URIs = tool!.getURIs()
+                
+            return try! VectorBrush(name: name, brushPrototypeURIs: URIs)
         }
         
         public func getSerializationStyle(brushName: String ) -> Style {
             // TODO: the style should be cached and only created when there is a change in the constants
-            let style = Style(brushUri: brushName);
-            style.pathPointProperties.alpha = constants.alpha;
-            style.pathPointProperties.blue = constants.blue;
-            style.pathPointProperties.green = constants.green;
-            style.pathPointProperties.offsetX = constants.offsetX;
-            style.pathPointProperties.offsetY = constants.offsetY;
-            style.pathPointProperties.offsetZ = constants.offsetZ;
-            style.pathPointProperties.red = constants.red;
-            style.pathPointProperties.rotation = constants.rotation;
-            style.pathPointProperties.scaleX = constants.scaleX;
-            style.pathPointProperties.scaleY = constants.scaleY;
-            style.pathPointProperties.scaleZ = constants.scaleZ;
-            style.pathPointProperties.size = constants.size;
+            let style = try! Style(brushUri: brushName);
+            style.pathPointProperties?.alpha = constants.alpha;
+            style.pathPointProperties?.blue = constants.blue;
+            style.pathPointProperties?.green = constants.green;
+            style.pathPointProperties?.offsetX = constants.offsetX;
+            style.pathPointProperties?.offsetY = constants.offsetY;
+            style.pathPointProperties?.offsetZ = constants.offsetZ;
+            style.pathPointProperties?.red = constants.red;
+            style.pathPointProperties?.rotation = constants.rotation;
+            style.pathPointProperties?.scaleX = constants.scaleX;
+            style.pathPointProperties?.scaleY = constants.scaleY;
+            style.pathPointProperties?.scaleZ = constants.scaleZ;
+            style.pathPointProperties?.size = constants.size;
             
             return style;
         }
@@ -190,7 +204,9 @@ class Quartz2D {
             
             stringBuilder += "\n"
             
-            return MD5HashGenerator.getMD5Hash(input: stringBuilder)
+            var bytes = MD5HashGenerator.getMD5Hash(input: stringBuilder)
+            // Fix check if neeeded Endian reverse Identifier.reverse
+            return NSUUID(uuidBytes: bytes).uuidString
             
         }
         
