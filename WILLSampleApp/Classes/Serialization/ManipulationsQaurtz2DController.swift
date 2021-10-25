@@ -47,8 +47,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     var isLoad: Bool = false
     var interactionEnabled = true
     
-    
-    @IBOutlet weak var toolSelectionButton: UIButton!
+    @IBOutlet weak var buttonsView: UIView!
     @IBOutlet weak var transformationTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var penButton: UIButton!
     @IBOutlet weak var feltButton: UIButton!
@@ -57,7 +56,9 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBOutlet weak var wholeStrokeEraserButton: UIButton!
     @IBOutlet weak var partialStrokeSelectorButton: UIButton!
     @IBOutlet weak var wholeStrokeSelectorButton: UIButton!
-    @IBOutlet weak var buttonsStackView: UIStackView!
+    @IBOutlet weak var colorPickerButton: UIButton!
+    @IBOutlet weak var shareButton: UIButton!
+    
     @IBOutlet weak var selectInkButton: UIButton!
     
     override func viewDidLoad() {
@@ -65,11 +66,11 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         
         let navigationSize = navigationController?.navigationBar.frame.size
         
-        spatialContextLabel = UILabel(frame: CGRect(x: 10, y: 1.6 * navigationSize!.height, width: 120, height: 30))
+        spatialContextLabel = UILabel(frame: CGRect(x: 10, y: 1.6 * (navigationSize?.height ?? 0), width: 120, height: 30))
         spatialContextLabel!.text = "Spatial context: "
 
         spatialContextSegmentedControl = UISegmentedControl(items: DemosSpatialContextType.allValues())
-        spatialContextSegmentedControl.frame = CGRect(x: 10 + spatialContextLabel.frame.maxX, y: 1.6 * navigationSize!.height, width: 250, height: 30)
+        spatialContextSegmentedControl.frame = CGRect(x: 10 + spatialContextLabel.frame.maxX, y: 1.6 * (navigationSize?.height ?? 0), width: 250, height: 30)
         spatialContextSegmentedControl.selectedSegmentIndex = 0
         spatialContextSegmentedControl.tintColor = UIColor.black
 
@@ -172,11 +173,8 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         customView.layer.masksToBounds = true
         customView.backgroundColor = .red
         
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapColorPicker))
-        customView.addGestureRecognizer(tapGestureRecognizer)
-        
-        let barButtonItem = UIBarButtonItem(customView: customView)
-        self.navigationItem.rightBarButtonItem = barButtonItem
+//        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapColorPicker))
+//        customView.addGestureRecognizer(tapGestureRecognizer)
         
 //        view.addSubview(spatialContextLabel)
 //        view.addSubview(spatialContextSegmentedControl)
@@ -212,7 +210,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                 } else if sender.state == .ended {
                     serializationModel!.rotateEnded(sender)
                     //isRTreeLeavesShowHandler()
-                    
                 }
             }
         }
@@ -220,146 +217,173 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     
     @objc func didTapRedColor() {
         serializationModel?.inkColor = .red
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .red
+        self.colorPickerButton.backgroundColor = .red
         lastToolColor = .red
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBlueColor() {
         serializationModel?.inkColor = .blue
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .blue
+        self.colorPickerButton.backgroundColor = .blue
         lastToolColor = .blue
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapYellowColor() {
         serializationModel?.inkColor = .yellow
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .yellow
+        self.colorPickerButton.backgroundColor = .yellow
         lastToolColor = .yellow
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapPurpleColor() {
         serializationModel?.inkColor = .purple
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .purple
+        self.colorPickerButton.backgroundColor = .purple
         lastToolColor = .purple
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapGreenColor() {
         serializationModel?.inkColor = .green
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .green
+        self.colorPickerButton.backgroundColor = .green
         lastToolColor = .green
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapOrangeColor() {
         serializationModel?.inkColor = .orange
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .orange
+        self.colorPickerButton.backgroundColor = .orange
         lastToolColor = .orange
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBlackColor() {
         serializationModel?.inkColor = .black
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .black
+        self.colorPickerButton.backgroundColor = .black
         lastToolColor = .black
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBrownColor() {
         serializationModel?.inkColor = .brown
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .brown
+        self.colorPickerButton.backgroundColor = .brown
         lastToolColor = .brown
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapGrayColor() {
         serializationModel?.inkColor = .gray
-        self.navigationItem.rightBarButtonItem?.customView?.backgroundColor = .gray
+        self.colorPickerButton.backgroundColor = .gray
         lastToolColor = .gray
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func didTapColorPicker() {
+    @IBAction func didTapFileBrowser(_ sender: UIButton) {
+        let documentPicker: UIDocumentPickerViewController!
+        
+        documentPicker =  UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
+        isLoad = true
+        documentPicker.delegate = self
+        
+        present(documentPicker, animated: true, completion: nil)
+    }
+    
+    @IBAction func didTapShareButton(_ sender: UIButton) {
+        self.fileExtension = "uim"
+        
+        let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+        
+        self.isLoad = false
+        documentPicker.delegate = self
+        
+        self.present(documentPicker, animated: true, completion: nil)
+    }
+    
+    @IBAction func didTapBackButton(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func didTapColorPicker(_ sender: UIButton) {
+        let colorViewSize: CGFloat = 44
+        
         let redColorView = UIView()
         redColorView.backgroundColor = .red
-        redColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        redColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        redColorView.layer.cornerRadius = 25
+        redColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        redColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        redColorView.layer.cornerRadius = colorViewSize / 2
         let redGR = UITapGestureRecognizer(target: self, action: #selector(didTapRedColor))
         redColorView.addGestureRecognizer(redGR)
         
         let blueColorView = UIView()
         blueColorView.backgroundColor = .blue
-        blueColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        blueColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        blueColorView.layer.cornerRadius = 25
+        blueColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        blueColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        blueColorView.layer.cornerRadius = colorViewSize / 2
         let blueGR = UITapGestureRecognizer(target: self, action: #selector(didTapBlueColor))
         blueColorView.addGestureRecognizer(blueGR)
     
         let yellowColorView = UIView()
         yellowColorView.backgroundColor = .yellow
-        yellowColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        yellowColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        yellowColorView.layer.cornerRadius = 25
+        yellowColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        yellowColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        yellowColorView.layer.cornerRadius = colorViewSize / 2
         let yellowGR = UITapGestureRecognizer(target: self, action: #selector(didTapYellowColor))
         yellowColorView.addGestureRecognizer(yellowGR)
         
         let purpleColorView = UIView()
         purpleColorView.backgroundColor = .purple
-        purpleColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        purpleColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        purpleColorView.layer.cornerRadius = 25
+        purpleColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        purpleColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        purpleColorView.layer.cornerRadius = colorViewSize / 2
         let purpleGR = UITapGestureRecognizer(target: self, action: #selector(didTapPurpleColor))
         purpleColorView.addGestureRecognizer(purpleGR)
         
         let greenColorView = UIView()
         greenColorView.backgroundColor = .green
-        greenColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        greenColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        greenColorView.layer.cornerRadius = 25
+        greenColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        greenColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        greenColorView.layer.cornerRadius = colorViewSize / 2
         let greenGR = UITapGestureRecognizer(target: self, action: #selector(didTapGreenColor))
         greenColorView.addGestureRecognizer(greenGR)
         
         let orangeColorView = UIView()
         orangeColorView.backgroundColor = .orange
-        orangeColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        orangeColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        orangeColorView.layer.cornerRadius = 25
+        orangeColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        orangeColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        orangeColorView.layer.cornerRadius = colorViewSize / 2
         let orangeGR = UITapGestureRecognizer(target: self, action: #selector(didTapOrangeColor))
         orangeColorView.addGestureRecognizer(orangeGR)
         
         let blackColorView = UIView()
         blackColorView.backgroundColor = .black
-        blackColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        blackColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        blackColorView.layer.cornerRadius = 25
+        blackColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        blackColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        blackColorView.layer.cornerRadius = colorViewSize / 2
         let blackGR = UITapGestureRecognizer(target: self, action: #selector(didTapBlackColor))
         blackColorView.addGestureRecognizer(blackGR)
         
         let brownColorView = UIView()
         brownColorView.backgroundColor = .brown
-        brownColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        brownColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        brownColorView.layer.cornerRadius = 25
+        brownColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        brownColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        brownColorView.layer.cornerRadius = colorViewSize / 2
         let brownGR = UITapGestureRecognizer(target: self, action: #selector(didTapBrownColor))
         brownColorView.addGestureRecognizer(brownGR)
         
         let grayColorView = UIView()
         grayColorView.backgroundColor = .gray
-        grayColorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        grayColorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        grayColorView.layer.cornerRadius = 25
+        grayColorView.heightAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        grayColorView.widthAnchor.constraint(equalToConstant: colorViewSize).isActive = true
+        grayColorView.layer.cornerRadius = colorViewSize / 2
         let grayGR = UITapGestureRecognizer(target: self, action: #selector(didTapGrayColor))
         grayColorView.addGestureRecognizer(grayGR)
 
-        let popover = UIAlertController(title: "\n\n\n\n\n\n\n\n\n\n\n\n\n", message: nil, preferredStyle: .actionSheet)
-        popover.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
+        let popover = UIAlertController(title: "", message: nil, preferredStyle: .actionSheet)
+        popover.popoverPresentationController?.sourceView = colorPickerButton
         
         let mainStackView = UIStackView()
         mainStackView.axis = NSLayoutConstraint.Axis.vertical
-        mainStackView.distribution = UIStackView.Distribution.fillProportionally
+        mainStackView.distribution = UIStackView.Distribution.equalSpacing
         mainStackView.alignment = UIStackView.Alignment.center
         mainStackView.spacing = 3
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -400,15 +424,17 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         mainStackView.addArrangedSubview(topStackView)
         mainStackView.addArrangedSubview(midStackView)
         mainStackView.addArrangedSubview(bottomStackView)
-                
-        let leadingConstraint = NSLayoutConstraint(item: mainStackView, attribute: .leading, relatedBy: .equal, toItem: popover.view, attribute: .leading, multiplier: 1, constant: 0)
-        let trailingConstraint = NSLayoutConstraint(item: mainStackView, attribute: .trailing, relatedBy: .equal, toItem: popover.view, attribute: .trailing, multiplier: 1, constant: 0)
-        let topConstraint = NSLayoutConstraint(item: mainStackView, attribute: .top, relatedBy: .equal, toItem: popover.view, attribute: .top, multiplier: 1, constant: 0)
-        let bottomConstraint = NSLayoutConstraint(item: mainStackView, attribute: .bottom, relatedBy: .equal, toItem: popover.view, attribute: .bottom, multiplier: 1, constant: 0)
-        
+          
         popover.view.addSubview(mainStackView)
         
-        popover.view.addConstraints([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
+        mainStackView.topAnchor.constraint(equalTo: popover.view.topAnchor, constant: 10).isActive = true
+        mainStackView.rightAnchor.constraint(equalTo: popover.view.rightAnchor, constant: 10).isActive = true
+        mainStackView.leftAnchor.constraint(equalTo: popover.view.leftAnchor, constant: 10).isActive = true
+        mainStackView.heightAnchor.constraint(equalToConstant: 170).isActive = true
+        
+        popover.view.translatesAutoresizingMaskIntoConstraints = false
+        popover.view.heightAnchor.constraint(equalToConstant: 190).isActive = true
         
         present(popover, animated: true, completion: nil)
     }
@@ -448,7 +474,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         if interactionEnabled {
             isDrawingStroke = true
             serializationModel!.touchesBegan(touches, with: event, view: view)
-            buttonsStackView.isUserInteractionEnabled = false
+            buttonsView.isUserInteractionEnabled = false
         }
     }
     
@@ -462,14 +488,14 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         isDrawingStroke = false
-        buttonsStackView.isUserInteractionEnabled = true
+        buttonsView.isUserInteractionEnabled = true
     }
     
     override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         enableToolsButtons()
         if interactionEnabled {
             isDrawingStroke = false
-            buttonsStackView.isUserInteractionEnabled = true
+            buttonsView.isUserInteractionEnabled = true
             serializationModel!.touchesEnded(touches, with: event, view: view)
         }
         
@@ -801,7 +827,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     let alertController = UIAlertController(title: "Raster ink in vector canvas", message: "The ink model you are trying to load contains raster ink. Ink manipulation is disabled.", preferredStyle: .alert)
                     let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                     alertController.addAction(alertAction)
-                    toolSelectionButton.isEnabled = false
                     try! serializationModel!.load(url: url, viewLayer: view.layer)
                     isRTreeLeavesShowHandler()
                     interactionEnabled = false
@@ -822,7 +847,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                 } else {
                     try! serializationModel!.load(url: url, viewLayer: view.layer)
                     isRTreeLeavesShowHandler()
-                    toolSelectionButton.isEnabled = true
                     interactionEnabled = true
                 }
             } else {
@@ -836,7 +860,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
            
             //let result = saveModel!.validate()
             
-            let alertController = UIAlertController(title: "Name", message: "Choose a name", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Name", message: "", preferredStyle: .alert)
             
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (alertAction) in
             }
@@ -851,7 +875,8 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                 self.saveModel!.selectedFileName = self.fileName
                 
                 if self.saveModel!.isValid {
-                    var urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!).\(self.fileExtension)")
+                    let fileExt = (self.saveModel?.selectedFileName ?? "").hasSuffix(".\(self.fileExtension)") ? "" : ".\(self.fileExtension)"
+                    var urlToSave = self.saveModel!.selectedFolderURL!.appendingPathComponent("\(self.saveModel!.selectedFileName!.appending(fileExt))")
                     if urlToSave.checkFileExist() {
                         let date = Date()
                         let format = DateFormatter()
@@ -871,9 +896,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                         switch self.fileExtension {
                         case "uim":
                             try self.serializationModel!.save(urlToSave)//, name: saveNameFile)
-                            print("Saved successfully in \(urlToSave.path)")
-                        case "pdf":
-                            try self.serializationModel?.savePDF(urlToSave)
                             print("Saved successfully in \(urlToSave.path)")
                         default:
                             print("unknown file extension")
@@ -895,37 +917,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
             
             present(alertController, animated: true, completion: nil)
         }
-    }
-    
-    @IBAction func didTapSaveAsPDF(_ sender: UIButton) {
-        fileExtension = "pdf"
-        let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
-        
-        isLoad = false
-        documentPicker.delegate = self
-        
-        present(documentPicker, animated: true, completion: nil)
-    }
-    
-    @IBAction func didTapSave(_ sender: UIButton) {
-        fileExtension = "uim"
-        
-        let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
-        
-        isLoad = false
-        documentPicker.delegate = self
-        
-        present(documentPicker, animated: true, completion: nil)
-    }
-    
-    @IBAction func didTapLoad(_ sender: UIButton) {
-        let documentPicker: UIDocumentPickerViewController!
-        
-        documentPicker =  UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
-        isLoad = true
-        documentPicker.delegate = self
-        
-        present(documentPicker, animated: true, completion: nil)
     }
     
     @objc func selectSpatialContext(control: UISegmentedControl) {
@@ -969,7 +960,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     private func disableToolsButtons() {
-        toolSelectionButton.isEnabled = false
         penButton.isEnabled = false
         feltButton.isEnabled = false
         brushButton.isEnabled = false
@@ -980,7 +970,6 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     private func enableToolsButtons() {
-        toolSelectionButton.isEnabled = true
         penButton.isEnabled = true
         feltButton.isEnabled = true
         brushButton.isEnabled = true

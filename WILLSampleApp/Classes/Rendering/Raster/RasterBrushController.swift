@@ -10,7 +10,6 @@ import WacomInk
 
 class RasterBrushController: RedrawController
 {
-    @IBOutlet weak var configButton: UIButton!
     @IBOutlet weak var pencilButton: UIButton!
     @IBOutlet weak var waterBrushButton: UIButton!
     @IBOutlet weak var crayonButton: UIButton!

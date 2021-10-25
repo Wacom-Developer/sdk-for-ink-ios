@@ -85,13 +85,6 @@ class ApplicationModel {
         try data.write(to: url)
     }
     
-    func writePDF(to url: URL) throws {
-        let inkModel = try getInkModel()
-        
-        let pdfExporter = PDFExporter()
-        let pdf = pdfExporter.exportToPDF(inkDocument: inkModel, pdfWidth: PDFExporter.PDF_A4_WIDTH, pdfHeight: PDFExporter.PDF_A4_HEIGHT, fit: true)
-    }
-    
     func hasVectorInk(url: URL) -> Bool {
         do {
             let data = try Data(contentsOf: url)

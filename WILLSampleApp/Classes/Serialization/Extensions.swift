@@ -11,7 +11,7 @@ import WacomInk
 
 extension Float {
     public func toString(precision: Int) -> String {
-        return String(format: "%.2f", self)
+        return String(format: "%.\(precision)f", self)
     }
 }
 
@@ -25,6 +25,28 @@ extension String {
     func toCGFloat() -> CGFloat {
         let sourceText = self
         return CGFloat((sourceText as NSString).floatValue)
+    }
+}
+
+extension String.Index {
+    func distance<S: StringProtocol>(in string: S) -> Int {
+        string.distance(to: self)
+    }
+}
+
+extension StringProtocol {
+    func distance(of element: Element) -> Int? {
+        firstIndex(of: element)?.distance(in: self)
+    }
+    
+    func distance<S: StringProtocol>(of string: S) -> Int? {
+        range(of: string)?.lowerBound.distance(in: self)
+    }
+}
+
+extension Collection {
+    func distance(to index: Index) -> Int {
+        distance(from: startIndex, to: index)
     }
 }
 
@@ -142,4 +164,21 @@ extension UIView {
             layer.render(in: rendererContext.cgContext)
         }
     }
+}
+
+extension UIImage {
+  func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
+    UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        
+    guard let ctx = UIGraphicsGetCurrentContext(), let image = cgImage else { return self }
+    defer { UIGraphicsEndImageContext() }
+        
+    let rect = CGRect(origin: .zero, size: size)
+    ctx.setFillColor(color.cgColor)
+    ctx.fill(rect)
+    ctx.concatenate(CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height))
+    ctx.draw(image, in: rect)
+        
+    return UIGraphicsGetImageFromCurrentImageContext() ?? self
+  }
 }
