@@ -85,6 +85,46 @@ class ApplicationModel {
         try data.write(to: url)
     }
     
+    func writePDF(to url: URL) throws {
+        let inkModel = try getInkModel()
+        
+        let pdfExporter = PDFExporter()
+        let pdf = pdfExporter.exportToPDF(inkDocument: inkModel, pdfWidth: PDFExporter.PDF_A4_WIDTH, pdfHeight: PDFExporter.PDF_A4_HEIGHT, fit: true)
+        
+        let data = pdf.data(using: .utf8)
+        try data?.write(to: url)
+    }
+    
+    func writeSVG(to url: URL) throws {
+        let inkModel = try getInkModel()
+        
+        let svgExporter = SVGExporter()
+        let xml = svgExporter.exportToSVG(inkDocument: inkModel, svgWidth: 2000, svgHeight: 2000, fit: true)
+        
+        do {
+            try xml.toXMLString().write(to: url, atomically: false, encoding: .utf8)
+            print("url -> \(url)")
+        }
+        catch {
+            print("ERROR: \(error)")
+        }
+    }
+    
+    func writePNG(to url: URL) throws {
+        let inkModel = try getInkModel()
+        
+        let pngExporter = PNGExporter()
+        let image = pngExporter.exportToPNG(inkDocument: inkModel, pngWidth: 1500, pngHeight: 1500, fit: true)
+        
+        do {
+            try image?.pngData()?.write(to: url)
+            print("url -> \(url)")
+        }
+        catch {
+            print("ERROR: \(error)")
+        }
+    }
+    
     func hasVectorInk(url: URL) -> Bool {
         do {
             let data = try Data(contentsOf: url)

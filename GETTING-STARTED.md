@@ -41,4 +41,12 @@ To build and run the sample app follow these steps:
 
 ![image info](./media/IMG_0281.PNG)
 
+### Export utilities
+
+The Export Utilities for iOS can be accessed through the Save as... button in the top bar of the WILL SDK for Ink.
+
+The user may then export the file to a format of their choosing.
+
+![Export utilities](media/export-utilities.png)
+
 ---

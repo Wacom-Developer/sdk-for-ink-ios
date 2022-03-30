@@ -298,6 +298,18 @@ class SerializationQuartz2DModel {
         try applicationModel.write(to: url)
     }
     
+    func savePDF(_ url: URL) throws {
+        try applicationModel.writePDF(to: url)
+    }
+    
+    func saveSVG(_ url: URL) throws {
+        try applicationModel.writeSVG(to: url)
+    }
+    
+    func savePNG(_ url: URL) throws {
+        try applicationModel.writePNG(to: url)
+    }
+    
     func hasRasterInk(url: URL) -> Bool {
         return applicationModel.hasRasterInk(url: url)
     }

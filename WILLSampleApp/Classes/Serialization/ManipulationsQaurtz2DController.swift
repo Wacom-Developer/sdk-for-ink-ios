@@ -289,14 +289,63 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     @IBAction func didTapShareButton(_ sender: UIButton) {
-        self.fileExtension = "uim"
+        let alert = UIAlertController(title: "Save as...", message: "Please Select File Format", preferredStyle: .actionSheet)
         
-        let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+        alert.addAction(UIAlertAction(title: ".uim", style: .default , handler:{ (UIAlertAction)in
+            alert.dismiss(animated: true) {
+                self.fileExtension = "uim"
+                
+                let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+                
+                self.isLoad = false
+                documentPicker.delegate = self
+                
+                self.present(documentPicker, animated: true, completion: nil)
+            }
+        }))
         
-        self.isLoad = false
-        documentPicker.delegate = self
+        alert.addAction(UIAlertAction(title: ".pdf", style: .default , handler:{ (UIAlertAction)in
+            alert.dismiss(animated: true) {
+                self.fileExtension = "pdf"
+                
+                let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+                
+                self.isLoad = false
+                documentPicker.delegate = self
+                
+                self.present(documentPicker, animated: true, completion: nil)
+            }
+        }))
         
-        self.present(documentPicker, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: ".svg", style: .default , handler:{ (UIAlertAction)in
+            alert.dismiss(animated: true) {
+                self.fileExtension = "svg"
+                
+                let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+                
+                self.isLoad = false
+                documentPicker.delegate = self
+                
+                self.present(documentPicker, animated: true, completion: nil)
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: ".png", style: .default , handler:{ (UIAlertAction)in
+            alert.dismiss(animated: true) {
+                self.fileExtension = "png"
+                
+                let documentPicker = UIDocumentPickerViewController(documentTypes: [kUTTypeFolder as String], in: .open)
+                
+                self.isLoad = false
+                documentPicker.delegate = self
+                
+                self.present(documentPicker, animated: true, completion: nil)
+            }
+        }))
+        
+        alert.popoverPresentationController?.sourceView = shareButton
+
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func didTapBackButton(_ sender: UIButton) {
@@ -896,6 +945,15 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                         switch self.fileExtension {
                         case "uim":
                             try self.serializationModel!.save(urlToSave)//, name: saveNameFile)
+                            print("Saved successfully in \(urlToSave.path)")
+                        case "pdf":
+                            try self.serializationModel?.savePDF(urlToSave)
+                            print("Saved successfully in \(urlToSave.path)")
+                        case "svg":
+                            try self.serializationModel?.saveSVG(urlToSave)
+                            print("Saved successfully in \(urlToSave.path)")
+                        case "png":
+                            try self.serializationModel?.savePNG(urlToSave)
                             print("Saved successfully in \(urlToSave.path)")
                         default:
                             print("unknown file extension")
