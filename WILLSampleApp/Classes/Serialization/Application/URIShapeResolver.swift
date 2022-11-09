@@ -31,7 +31,7 @@ class URIShapeResolver {
                 case "radius":
                     radius = Float(value) ?? 1.0
                 default:
-                    throw "Unknown key in brush prototype URI -> \(key)"
+                    throw WILLEror.error(description: "Unknown key in brush prototype URI -> \(key)")
                 }
             }
             return try BrushPolygon.createNormalized(minScale: uri.minScale, points: ShapeFactory.createCircle(n: precision, r: radius))
@@ -52,13 +52,13 @@ class URIShapeResolver {
                 case "radiusY":
                     radiusY = Float(value) ?? 0.5
                 default:
-                    throw "Unknown key in brush prototype URI -> \(key)"
+                    throw WILLEror.error(description: "Unknown key in brush prototype URI -> \(key)")
                 }
             }
             
             return try BrushPolygon.createNormalized(minScale: uri.minScale, points: ShapeFactory.createEllipse(n: precision, rx: radiusX, ry: radiusY))
         default:
-            throw "Unknown shape type when parsing URI"
+            throw WILLEror.error(description: "Unknown shape type when parsing URI")
         }
     }
 }

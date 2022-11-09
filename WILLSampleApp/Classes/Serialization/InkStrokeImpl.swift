@@ -31,7 +31,6 @@ class Quartz2D {
             let resultStroke = InkStroke(
                 identifier: identifier!,
                 spline: newSpline,
-                layout: originalStroke.layout,
                 vectorBrush: originalStroke.vectorBrush,
                 constants: originalStroke.constants as! Quartz2D.ConstantAttributes,
                 sensorDataOffset: originalStroke.sensorDataOffset + UInt32(firstPointIndex),
@@ -101,27 +100,30 @@ class Quartz2D {
         public var constants: StrokeAttributesProtocol = ConstantAttributes()
         public var id: Identifier
         public var spline: Spline
-        public var layout: PathPointLayout
         public var vectorBrush: Geometry.VectorBrush
         public var sensorDataOffset: UInt32 = 0
         public var sensorDataMappings: [UInt32] = []
-        public var brushName: String
+        public var brushName: String?
         public var tool: VectorTool?
+        
+        public var layoutMask: LayoutMask {
+            get {
+                return spline.layoutMask
+            }
+        }
         
         public init(
             identifier: Identifier,
             spline: Spline,
-            layout: PathPointLayout,
             vectorBrush: Geometry.VectorBrush,
             constants: ConstantAttributes,
             sensorDataOffset: UInt32,
             sensorDataMappings: [UInt32],
-            brushName: String,
-            tool: VectorTool?
+            brushName: String? = nil,
+            tool: VectorTool? = nil
         ) {
             self.id = identifier
             self.spline = spline
-            self.layout = layout
             self.vectorBrush = vectorBrush
             self.constants = constants
             self.sensorDataOffset = sensorDataOffset
@@ -133,66 +135,75 @@ class Quartz2D {
         public init(
             identifier: Identifier,
             spline: Spline,
-            layout: PathPointLayout,
             vectorBrush: Geometry.VectorBrush,
             constants: ConstantAttributes,
-            brushName: String,
-            tool: VectorTool?
+            brushName: String? = nil,
+            tool: VectorTool? = nil
         ) {
             self.id = identifier
             self.spline = spline
-            self.layout = layout
             self.vectorBrush = vectorBrush
             self.constants = constants
-            self.sensorDataOffset = 0 // Fix review
+            self.sensorDataOffset = 0
             self.sensorDataMappings = []
-            let pointsCount = self.layout.count == 0 ? 0 : self.spline.path.count / self.layout.count //- 2 // FIX, to be reviseds Remove first and last control points in spline
-            self.sensorDataMappings.reserveCapacity(pointsCount)
             self.brushName = brushName
             self.tool = tool
+            
+            let pointsCount = spline.layoutMask.count == 0 ? 0 : self.spline.path.count / spline.layoutMask.count
+            self.sensorDataMappings.reserveCapacity(pointsCount)
             
             // One to one mapping of sensor data points to spline points
             for i in 0..<pointsCount {
                 self.sensorDataMappings.append(UInt32(i));
             }
         }
+        
         // start serialization region
         
-        public func getSerializationVectorBrush() -> VectorBrush {
+        public func getSerializationVectorBrush() throws -> VectorBrush {
             // TODO: the brush should be cached and only created when there is a change in the brush polygons
-            let name = URIBuilder.getBrushURI(type: "vector", name: brushName)
-                         
-            let URIs = tool!.getURIs()
-                
-            return try! VectorBrush(name: name, brushPrototypeURIs: URIs)
+            let brushName = try getUniqueBrushName();
+            var polysSer: [BrushPolygonSer]?
+            
+            polysSer = try vectorBrush.polygons.map {
+                try BrushPolygonSer(minScale: $0.minScale, points: $0.points.map { Float2($0.x, $0.y) })
+            }
+            
+            
+            return try! VectorBrush(
+                name: brushName,
+                brushPolygons: polysSer);
         }
         
-        public func getSerializationStyle(brushName: String ) -> Style {
+        public func getSerializationStyle(brushName: String ) throws -> Style {
             // TODO: the style should be cached and only created when there is a change in the constants
-            let style = try! Style(brushUri: brushName);
-            style.pathPointProperties?.alpha = constants.alpha;
-            style.pathPointProperties?.blue = constants.blue;
-            style.pathPointProperties?.green = constants.green;
-            style.pathPointProperties?.offsetX = constants.offsetX;
-            style.pathPointProperties?.offsetY = constants.offsetY;
-            style.pathPointProperties?.offsetZ = constants.offsetZ;
-            style.pathPointProperties?.red = constants.red;
-            style.pathPointProperties?.rotation = constants.rotation;
-            style.pathPointProperties?.scaleX = constants.scaleX;
-            style.pathPointProperties?.scaleY = constants.scaleY;
-            style.pathPointProperties?.scaleZ = constants.scaleZ;
-            style.pathPointProperties?.size = constants.size;
+            let style = try Style(brushUri: brushName);
+            if let ppp = style.pathPointProperties {
+                //   Fix test
+                ppp.alpha = constants.alpha;
+                ppp.blue = constants.blue;
+                ppp.green = constants.green;
+                ppp.offsetX = constants.offsetX;
+                ppp.offsetY = constants.offsetY;
+                ppp.offsetZ = constants.offsetZ;
+                ppp.red = constants.red;
+                ppp.rotation = constants.rotation;
+                ppp.scaleX = constants.scaleX;
+                ppp.scaleY = constants.scaleY;
+                ppp.scaleZ = constants.scaleZ;
+                ppp.size = constants.size;
+            }
             
             return style;
         }
         
         //implementation
         
-        private func getUniqueBrushName() -> String {
+        private func getUniqueBrushName() throws -> String {
             // Code from MD5HashGenerator // TODO: discuss better ways for generating brush names
             // Generate VectorBrush
             // unique name based on the brush polygons content
-            var stringBuilder = ""//new StringBuilder();
+            var stringBuilder = ""
             
             for brushPoly in vectorBrush.polygons {
                 stringBuilder += String(format: "%.4f", brushPoly.minScale)
@@ -204,10 +215,9 @@ class Quartz2D {
             
             stringBuilder += "\n"
             
-            var bytes = MD5HashGenerator.getMD5Hash(input: stringBuilder)
-            // Fix check if neeeded Endian reverse Identifier.reverse
-            return NSUUID(uuidBytes: bytes).uuidString
+            let bytes = MD5HashGenerator.getMD5Hash(input: stringBuilder)
             
+            return try URIBuilder().buildNamedEntityURIByUUIDString(NSUUID(uuidBytes: bytes).uuidString)
         }
         
         // end serialization region

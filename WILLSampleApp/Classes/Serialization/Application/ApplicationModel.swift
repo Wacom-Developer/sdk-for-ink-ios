@@ -273,25 +273,25 @@ class ApplicationModel {
             
             // Add all sensor channels except 'Custom'
             var sensorChannels: [SensorChannel] = [
-                try SensorChannel(InkSensorType.x, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
-                try SensorChannel(InkSensorType.y,  metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision),
-                try SensorChannel(InkSensorType.timestamp, metric: InkSensorMetricType.time, resolution: nil, min: 0.0, max: 0.0, precision: 0)
+                try SensorChannel(InkSensorType.x, unit: ScalarUnit.dip, min: 0.0, max: 0.0, precision: precision),
+                try SensorChannel(InkSensorType.y, unit: ScalarUnit.dip, min: 0.0, max: 0.0, precision: precision),
+                try SensorChannel(InkSensorType.timestamp, unit: ScalarUnit.microsecond, min: 0.0, max: 0.0, precision: 0)
             ]
             
             if sensorPointerData.first!.force != nil {
-                sensorChannels.append(try SensorChannel(InkSensorType.pressure, metric: InkSensorMetricType.normalized, resolution: nil, min: 0.0, max: 1.0, precision: precision))
+                try sensorChannels.append(SensorChannel(InkSensorType.pressure, unit: ScalarUnit.normalized, min: 0.0, max: 1.0, precision: precision))
             }
             
             if sensorPointerData.first!.radius != nil {
-                sensorChannels.append(try SensorChannel(InkSensorType.radiusX, metric: InkSensorMetricType.length, resolution: nil, min: 0.0, max: 0.0, precision: precision))
+                try sensorChannels.append(SensorChannel(InkSensorType.radiusX, unit: ScalarUnit.dip, min: 0.0, max: 0.0, precision: precision))
             }
             
             if sensorPointerData.first!.azimuthAngle != nil {
-                sensorChannels.append(try SensorChannel(InkSensorType.azimuth, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
+                try sensorChannels.append(SensorChannel(InkSensorType.azimuth, unit: ScalarUnit.radian, min: 0.0, max: 2 * Float.pi, precision: precision))
             }
             
             if sensorPointerData.first!.altitudeAngle != nil {
-                sensorChannels.append(try SensorChannel(InkSensorType.altitude, metric: InkSensorMetricType.angle, resolution: nil, min: 0.0, max: 2 * Float.pi, precision: precision))
+                try sensorChannels.append(SensorChannel(InkSensorType.altitude, unit: ScalarUnit.radian, min: 0.0, max: 2 * Float.pi, precision: precision))
             }
             
             let sensorChannelGroup = try SensorChannelsContext(

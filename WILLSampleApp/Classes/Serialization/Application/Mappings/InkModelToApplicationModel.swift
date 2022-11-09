@@ -81,7 +81,7 @@ extension InkModel {
                             }
                             
                             
-                            let applicationStroke = ApplicationStroke(inkStroke: inkStroke, touchType: touchType)
+                            let applicationStroke = ApplicationStroke(inkStroke: inkStroke, touchType: .direct)
                             applicationStroke.sensorDataId = sensorDataId
                             resultAppModel.strokes.append(key: inkStroke.id, value: applicationStroke)
                         } catch let error {
@@ -168,11 +168,10 @@ extension InkModel {
                 constants.alpha = ppp.alpha!
             }
         }
-        let strokeLayout = try PathPointLayout(layoutMask: stroke.getSpline().layoutMask)
+        
         let returnInkStroke = Quartz2D.InkStroke(
             identifier: stroke.id,
             spline: try stroke.getSpline().copy() as! Spline,
-            layout: strokeLayout,
             vectorBrush: geometryVectorBrush!,
             constants: constants,
             brushName: "",

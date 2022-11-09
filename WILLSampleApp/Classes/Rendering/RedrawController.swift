@@ -152,13 +152,13 @@ class RedrawController: RenderingController {
         }
     }
     
-    override func drawBody() {
+    override func drawBody() throws {
         // drawing code goes here
         if redrawModel.isRedrawing {
             drawStrokes()
         }
         else {
-            super.drawBody()
+            try! super.drawBody()
             if loadingIndicator.isAnimating {
                 loadingIndicator.isHidden = true
                 loadingIndicator.stopAnimating()

@@ -14,7 +14,7 @@ class ApplicationStroke {
     public var touchType: UITouch.TouchType? = nil
     public var sensorDataId: Identifier? = nil
     
-    init(canvas: CAShapeLayer? = nil, inkStroke: Quartz2D.InkStroke, touchType: UITouch.TouchType? = nil) {
+    init(canvas: CAShapeLayer? = nil, inkStroke: Quartz2D.InkStroke, touchType: UITouch.TouchType) {
         self.canvas = canvas
         self.inkStroke = inkStroke
         self.touchType = touchType

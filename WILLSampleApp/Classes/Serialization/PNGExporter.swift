@@ -81,24 +81,23 @@ class PNGExporter {
         let alpha: Float = (stroke.style.pathPointProperties?.alpha)!
         
         // go through the pipeline and process the countours
-        let layout = PathPointLayout(layoutMask: try! stroke.getSpline().layoutMask)
-        let splineInterpolator = try! CurvatureBasedInterpolator(inputLayout: layout)
-        let brushApplier = try! BrushApplier(layout: layout, brush: vectorBrush)
+        let splineInterpolator = CurvatureBasedInterpolator()
+        let brushApplier = try! BrushApplier(brush: vectorBrush)
         let readOnlySpline = try! stroke.getSpline()
-        let spline = try! Spline(layoutMask: readOnlySpline.layoutMask, path: readOnlySpline.path, tStart: readOnlySpline.tStart, tFinal: readOnlySpline.tFinal)
+        let spline = try! Spline(path: Path(source: readOnlySpline.pathData, layoutMask: stroke.getSpline().layoutMask), tStart: readOnlySpline.tStart, tFinal: readOnlySpline.tFinal)
         let points = try! splineInterpolator.add(isFirst: true, isLast: true, addition: spline, prediction: nil)
-        let polys = try! brushApplier.add(isFirst: true, isLast: true, addition: points.0, prediction: points.1)
-        let hulls = try! mConvexHullChainProducer.add(isFirst: true, isLast: true, addition: polys.0, prediction: polys.1)
-        let merged = try! mPolygonMerger.add(isFirst: true, isLast: true, addition: hulls.0, prediction: hulls.1)
-        let simplified = try! mPolygonSimplifier.add(isFirst: true, isLast: true, addition: merged.0, prediction: merged.1)
+        let polys = try! brushApplier.add(isFirst: true, isLast: true, addition: points.addition, prediction: points.prediction)
+        let hulls = try! mConvexHullChainProducer.add(isFirst: true, isLast: true, addition: polys.addition, prediction: polys.prediction)
+        let merged = try! mPolygonMerger.add(isFirst: true, isLast: true, addition: hulls.addition, prediction: hulls.prediction)
+        let simplified = try! mPolygonSimplifier.add(isFirst: true, isLast: true, addition: merged.addition, prediction: merged.prediction)
         
-        if simplified.0 == nil {
+        if simplified.addition == nil {
             return
         }
         
         // convert the points returned from the pipeline to bezier path and render the path in the drawing context
         var bezierPath: UIBezierPath?
-        generateBezierPolys(simplified.0!, result: &bezierPath)
+        generateBezierPolys(simplified.addition!, result: &bezierPath)
         
         let red = CGFloat(stroke.style.pathPointProperties?.red ?? 0)
         let green = CGFloat(stroke.style.pathPointProperties?.green ?? 0)

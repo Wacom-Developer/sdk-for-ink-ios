@@ -11,26 +11,10 @@ import WacomInk
 import MobileCoreServices
 
 class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelegate {
-    public var serializationModel: SerializationQuartz2DModel?
+    public var manipulationsModel: ManipulationsModel?
     private var rTreeLayer: CAShapeLayer?
     private var rTreeBezierPath: UIBezierPath?
-    private var countNodes = 0
-    private var intersectBrushSizeLabel: UILabel!
-    private var intersectBrushSizeSlider: UISlider!
-    private var isRTreeLeavesShowLabel: UILabel!
-    private var isRTreeLeavesShowSwitch: UISwitch!
-    private var isErasingLabel: UILabel!
-    private var isErasingSwitch: UISwitch!
-    private var isRTreeWholeStrokeLabel: UILabel!
-    private var isRTreeWholeStrokeSwitch: UISwitch!
-    private var spatialContextLabel: UILabel!
-    private var spatialContextSegmentedControl: UISegmentedControl!
-    private var manipulationTypeLabel: UILabel!
-    private var manipulationTypeSegmentedControl: UISegmentedControl!
-    private var manipulatorCollectionTypeSegmentedControl: UISegmentedControl!
-    private var selectionButton: UIButton!
     private var rotateGestureRecognizer: UIRotationGestureRecognizer?
-    private var selectionOverlapModeSegmentedControl: UISegmentedControl!
     private var saveModel: UIDocumentPickerSaveModel?
     private var fileName = "Test"
     private var lastToolColor = UIColor.red
@@ -64,78 +48,9 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let navigationSize = navigationController?.navigationBar.frame.size
-        
-        spatialContextLabel = UILabel(frame: CGRect(x: 10, y: 1.6 * (navigationSize?.height ?? 0), width: 120, height: 30))
-        spatialContextLabel!.text = "Spatial context: "
-
-        spatialContextSegmentedControl = UISegmentedControl(items: DemosSpatialContextType.allValues())
-        spatialContextSegmentedControl.frame = CGRect(x: 10 + spatialContextLabel.frame.maxX, y: 1.6 * (navigationSize?.height ?? 0), width: 250, height: 30)
-        spatialContextSegmentedControl.selectedSegmentIndex = 0
-        spatialContextSegmentedControl.tintColor = UIColor.black
-
-        manipulationTypeLabel = UILabel(frame: CGRect(x: 10, y: spatialContextSegmentedControl.frame.maxY + 10, width: 140, height: 30))
-        manipulationTypeLabel!.text = "Type of operation: "
-
-        manipulationTypeSegmentedControl = UISegmentedControl(items: ManipulationType.allValues())
-        manipulationTypeSegmentedControl.frame = CGRect(x: 10 + manipulationTypeLabel.frame.maxX, y: spatialContextSegmentedControl.frame.maxY + 10, width: 250, height: 30)
-        manipulationTypeSegmentedControl.selectedSegmentIndex = 0
-        manipulationTypeSegmentedControl.tintColor = UIColor.black
-
-        isRTreeLeavesShowLabel = UILabel(frame: CGRect(x: 10, y: manipulationTypeSegmentedControl.frame.maxY + 10, width: 92, height: 30))
-        isRTreeLeavesShowLabel!.text = "Show rtree: "
-        isRTreeLeavesShowSwitch = UISwitch(frame: CGRect(x: 10 + isRTreeLeavesShowLabel.frame.maxX, y: isRTreeLeavesShowLabel.frame.minY, width: 30, height: 30))
-
-        isRTreeWholeStrokeLabel = UILabel(frame: CGRect(x: 10, y: isRTreeLeavesShowLabel.frame.maxY + 10, width: 112, height: 30))
-        isRTreeWholeStrokeLabel!.text = "Whole stroke: "
-        isRTreeWholeStrokeSwitch = UISwitch(frame: CGRect(x: 10 + isRTreeWholeStrokeLabel.frame.maxX, y: isRTreeWholeStrokeLabel.frame.minY, width: 30, height: 30))
-        isRTreeWholeStrokeSwitch.isOn = false
-
-        manipulatorCollectionTypeSegmentedControl = UISegmentedControl(items: ManipulatorCollectionType.allValues())
-        manipulatorCollectionTypeSegmentedControl.frame = CGRect(x: isRTreeWholeStrokeSwitch.frame.maxX + 10, y: isRTreeWholeStrokeSwitch.frame.minY, width: 150, height: 30)
-        manipulatorCollectionTypeSegmentedControl.selectedSegmentIndex = 0
-        manipulatorCollectionTypeSegmentedControl.tintColor = UIColor.black
-
-        intersectBrushSizeLabel = UILabel(frame: CGRect(x: 10, y: isRTreeWholeStrokeLabel.frame.maxY + 10, width: 90, height: 30))
-        intersectBrushSizeLabel!.text = "Brush size: "
-        intersectBrushSizeSlider = UISlider(frame: CGRect(x: 10 + intersectBrushSizeLabel.frame.maxX, y: intersectBrushSizeLabel.frame.minY, width: 120, height: 30))
-        intersectBrushSizeSlider.maximumValue = 30
-        intersectBrushSizeSlider.minimumValue = 1
-        intersectBrushSizeSlider.value = 3
-
-        isErasingLabel = UILabel(frame: CGRect(x: 10, y: intersectBrushSizeLabel.frame.maxY + 10, width: 80, height: 30))
-        isErasingLabel!.text = "Is erasing: "
-        isErasingSwitch = UISwitch(frame: CGRect(x: 10 + isErasingLabel.frame.maxX, y: isErasingLabel.frame.minY, width: 30, height: 30))
-        isErasingSwitch.isOn = true
-        
-        selectionButton = UIButton(frame: CGRect(x: 10, y: isRTreeWholeStrokeLabel!.frame.maxY + 10, width: 90, height: 30))
-        selectionButton!.setTitle("Select", for: .normal)//.text = "rTree precision: "
-        selectionButton!.setTitleColor(UIColor.white.inverted, for: .normal)// = backgroundColor.inverted
-        selectionButton!.backgroundColor = UIColor(red: 0.9, green: 0.1, blue: 0.2, alpha: 0.9)
-        selectionButton.layer.cornerRadius = 5
-        
-        selectionOverlapModeSegmentedControl = UISegmentedControl(items: Manipulator.OverlapMode.allValues())
-        selectionOverlapModeSegmentedControl.frame = CGRect(x: 10, y: selectionButton.frame.maxY + 10, width: 420, height: 30)
-        selectionOverlapModeSegmentedControl.selectedSegmentIndex = 0
-        selectionOverlapModeSegmentedControl.tintColor = UIColor.black
-        
-        transformationTypeSegmentedControl.selectedSegmentIndex = 0
-        transformationTypeSegmentedControl.tintColor = UIColor.black
-        
-        spatialContextSegmentedControl.addTarget(self, action: #selector(selectSpatialContext), for: UIControl.Event.valueChanged)
-        manipulationTypeSegmentedControl.addTarget(self, action: #selector(selectManipulation), for: UIControl.Event.valueChanged)
-        isRTreeLeavesShowSwitch.addTarget(self, action: #selector(isRTreeLeavesShowSwitchStateChanged), for: .valueChanged)
-        intersectBrushSizeSlider.addTarget(self, action: #selector(intersectBrushSizeSliderChanged), for: .valueChanged)
-        isRTreeWholeStrokeSwitch.addTarget(self, action: #selector(isWholeStrokeSwitchStateChanged), for: .valueChanged)
-        selectionButton!.addTarget(self, action: #selector(clickSelectionButton(sender:)), for: .touchUpInside)
-        manipulatorCollectionTypeSegmentedControl.addTarget(self, action: #selector(selectCollectionType), for: UIControl.Event.valueChanged)
-        transformationTypeSegmentedControl.addTarget(self, action: #selector(selectTransformaion), for: UIControl.Event.valueChanged)
-        selectionOverlapModeSegmentedControl.addTarget(self, action: #selector(selectOverlap), for: .valueChanged)
-        isErasingSwitch.addTarget(self, action: #selector(isErasingChanged), for: .valueChanged)
-        
-        serializationModel = SerializationQuartz2DModel(isCached: true)
-        serializationModel?.selectPen(inputType: .direct)
-        serializationModel?.inkColor = .red
+        manipulationsModel = try! ManipulationsModel()
+        manipulationsModel?.selectPen(inputType: .direct)
+        manipulationsModel?.inkColor = .red
         
         penButton.backgroundColor = .lightGray
         penButton.layer.cornerRadius = penButton.frame.width / 3
@@ -155,16 +70,9 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         rTreeLayer = view.layer.bounds.createCanvas()
         rTreeLayer?.fillColor = UIColor(red: 0.8, green: 0, blue: 0.1, alpha: 1).cgColor
         
-        serializationModel!.backgroundColor = UIColor.white
-        view.layer.backgroundColor = serializationModel!.backgroundColor.cgColor
+        manipulationsModel!.backgroundColor = UIColor.white
+        view.layer.backgroundColor = manipulationsModel!.backgroundColor.cgColor
         view.layer.addSublayer(rTreeLayer!)
-        
-        selectSpatialContextHandler()
-        selectManipulationHandler()
-        isRTreeLeavesShowHandler()
-        intersectBrushSizeSliderHandler()
-        selectCollectionTypeHandler()
-        selectTransformationHandler()
         
         saveModel = UIDocumentPickerSaveModel()
         
@@ -173,106 +81,94 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         customView.layer.masksToBounds = true
         customView.backgroundColor = .red
         
-//        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapColorPicker))
-//        customView.addGestureRecognizer(tapGestureRecognizer)
+        manipulationsModel?.set(manipulationType: .draw)
         
-//        view.addSubview(spatialContextLabel)
-//        view.addSubview(spatialContextSegmentedControl)
-//        view.addSubview(manipulationTypeLabel)
-//        view.addSubview(manipulationTypeSegmentedControl)
-//        view.addSubview(isRTreeLeavesShowLabel)
-//        view.addSubview(isRTreeLeavesShowSwitch)
-//        view.addSubview(isRTreeWholeStrokeLabel)
-//        view.addSubview(isRTreeWholeStrokeSwitch)
-//        view.addSubview(manipulatorCollectionTypeSegmentedControl)
-//        view.addSubview(intersectBrushSizeLabel)
-//        view.addSubview(intersectBrushSizeSlider)
-//        view.addSubview(isErasingLabel)
-//        view.addSubview(isErasingSwitch)
-        //view.addSubview(selectionButton)
-//        view.addSubview(selectionOverlapModeSegmentedControl)
-//        view.addSubview(includeInnerContourLabel)
-//        view.addSubview(includeInnerContourSwitch)
-//        view.addSubview(includeOuterContourLabel)
-//        view.addSubview(includeOuterContourSwitch)
+        transformationTypeSegmentedControl.selectedSegmentIndex = 0
+        transformationTypeSegmentedControl.tintColor = UIColor.black
+        transformationTypeSegmentedControl.addTarget(self, action: #selector(selectTransformaion), for: UIControl.Event.valueChanged)
+        transformationTypeSegmentedControl.isHidden = true
+        selectTransformaion()
+        
         rotateGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotatedView(_:)))
     }
     
     @objc func rotatedView(_ sender: UIRotationGestureRecognizer) {
-        if serializationModel!.selectedManipulationType == ManipulationType.select {
-            
-            if serializationModel!.hasSelection && serializationModel!.selectedManipulationAction == ManipulationAction.rotate {
+        if manipulationsModel!.selectedManipulationType == ManipulationType.select {
+            if manipulationsModel!.hasSelection && manipulationsModel!.selectedTransformationType == TransformationType.rotate {
                 if sender.state == .began {
-                    serializationModel!.rotateBegan(sender)
+                    manipulationsModel!.rotateBegan(sender)
                 } else if sender.state == .changed {
-                    serializationModel!.rotateMoved(sender)
+                    manipulationsModel!.rotateMoved(sender)
                     
                 } else if sender.state == .ended {
-                    serializationModel!.rotateEnded(sender)
-                    //isRTreeLeavesShowHandler()
+                    do {
+                        try manipulationsModel!.rotateEnded(sender)
+                    } catch {
+                        NSException(name:NSExceptionName(rawValue: "ManipulationsQaurtz2DController.rotatedView"), reason:"\(error)", userInfo:nil).raise()
+                    }
                 }
             }
         }
     }
     
     @objc func didTapRedColor() {
-        serializationModel?.inkColor = .red
+        manipulationsModel?.inkColor = .red
         self.colorPickerButton.backgroundColor = .red
         lastToolColor = .red
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBlueColor() {
-        serializationModel?.inkColor = .blue
+        manipulationsModel?.inkColor = .blue
         self.colorPickerButton.backgroundColor = .blue
         lastToolColor = .blue
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapYellowColor() {
-        serializationModel?.inkColor = .yellow
+        manipulationsModel?.inkColor = .yellow
         self.colorPickerButton.backgroundColor = .yellow
         lastToolColor = .yellow
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapPurpleColor() {
-        serializationModel?.inkColor = .purple
+        manipulationsModel?.inkColor = .purple
         self.colorPickerButton.backgroundColor = .purple
         lastToolColor = .purple
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapGreenColor() {
-        serializationModel?.inkColor = .green
+        manipulationsModel?.inkColor = .green
         self.colorPickerButton.backgroundColor = .green
         lastToolColor = .green
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapOrangeColor() {
-        serializationModel?.inkColor = .orange
+        manipulationsModel?.inkColor = .orange
         self.colorPickerButton.backgroundColor = .orange
         lastToolColor = .orange
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBlackColor() {
-        serializationModel?.inkColor = .black
+        manipulationsModel?.inkColor = .black
         self.colorPickerButton.backgroundColor = .black
         lastToolColor = .black
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapBrownColor() {
-        serializationModel?.inkColor = .brown
+        manipulationsModel?.inkColor = .brown
         self.colorPickerButton.backgroundColor = .brown
         lastToolColor = .brown
         dismiss(animated: true, completion: nil)
     }
     
     @objc func didTapGrayColor() {
-        serializationModel?.inkColor = .gray
+        manipulationsModel?.inkColor = .gray
         self.colorPickerButton.backgroundColor = .gray
         lastToolColor = .gray
         dismiss(animated: true, completion: nil)
@@ -488,13 +384,23 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         present(popover, animated: true, completion: nil)
     }
     
-    @IBAction func didTapResetAll(_ sender: UIButton) {
-        serializationModel?.removeAll(view: view)
+    @IBAction func didTapClearAll(_ sender: UIButton) {
+        if isSelectingInk {
+            if try! manipulationsModel!.onSelectButton(view: view) {
+                selectInkButton.setTitle("Select", for: .normal)
+                
+                view.removeGestureRecognizer(rotateGestureRecognizer!)
+                self.transformationTypeSegmentedControl.isHidden = true
+            }
+        }
+        
+        manipulationsModel?.removeAll(view: view)
+        manipulationsModel?.m_spatialModel.clear()
     }
     
     @IBAction func didTapSelect(_ sender: UIButton) {
         if isSelectingInk {
-            if serializationModel!.onSelectButton(view: view) {
+            if try! manipulationsModel!.onSelectButton(view: view) {
                 setSelectionButton()
             } else {
                 let alertController = UIAlertController(title: "Insufficient data", message:
@@ -510,7 +416,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         rTreeBezierPath = UIBezierPath()
         
         if isToShow {
-            let rects = serializationModel!.getAllNodes(bounds:view.layer.bounds)
+            let rects = manipulationsModel!.getAllNodes(bounds:view.layer.bounds)
             numberOfNodes = rects.count
             for rect in rects {
                 rTreeBezierPath!.append(UIBezierPath(rect: rect))
@@ -522,7 +428,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if interactionEnabled {
             isDrawingStroke = true
-            serializationModel!.touchesBegan(touches, with: event, view: view)
+            manipulationsModel!.touchesBegan(touches, with: event, view: view)
             buttonsView.isUserInteractionEnabled = false
         }
     }
@@ -530,7 +436,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if interactionEnabled {
             if touches.first!.force != 0.3333333333333333 {
-                serializationModel!.touchesMoved(touches, with: event, view: view)
+                manipulationsModel!.touchesMoved(touches, with: event, view: view)
             }
         }
     }
@@ -545,7 +451,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         if interactionEnabled {
             isDrawingStroke = false
             buttonsView.isUserInteractionEnabled = true
-            serializationModel!.touchesEnded(touches, with: event, view: view)
+            manipulationsModel!.touchesEnded(touches, with: event, view: view)
         }
         
         queuedOperation?()
@@ -585,21 +491,19 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapPenButton(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.selectPen(inputType: .direct)
-                self.selectInkButton.isHidden = true
-                self.transformationTypeSegmentedControl.isHidden = true
-                self.serializationModel?.set(manipulationType: .draw)
-                self.isSelectingInk = false
-                self.serializationModel?.inkColor = self.lastToolColor
+                self.manipulationsModel?.selectPen(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .draw)
+                self.manipulationsModel?.inkColor = self.lastToolColor
             }
         } else {
-            selectInkButton.isHidden = true
-            transformationTypeSegmentedControl.isHidden = true
-            serializationModel?.set(manipulationType: .draw)
-            isSelectingInk = false
-            serializationModel?.inkColor = lastToolColor
-            serializationModel?.selectPen(inputType: .direct)
+            manipulationsModel?.selectPen(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .draw)
+            manipulationsModel?.inkColor = lastToolColor
         }
+        
+        isSelectingInk = false
+        self.transformationTypeSegmentedControl.isHidden = true
+        selectInkButton.isHidden = true
         
         penButton.backgroundColor = .lightGray
         penButton.layer.cornerRadius = penButton.frame.width / 3
@@ -620,17 +524,19 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapFeltButton(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.selectFelt(inputType: .direct)
+                self.manipulationsModel?.selectFelt(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .draw)
+                self.manipulationsModel?.inkColor = self.lastToolColor
             }
         } else {
-            serializationModel?.selectFelt(inputType: .direct)
+            manipulationsModel?.selectFelt(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .draw)
+            manipulationsModel?.inkColor = lastToolColor
         }
         
+        self.transformationTypeSegmentedControl.isHidden = true
         selectInkButton.isHidden = true
-        transformationTypeSegmentedControl.isHidden = true
-        serializationModel?.set(manipulationType: .draw)
         isSelectingInk = false
-        serializationModel?.inkColor = lastToolColor
 
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -651,17 +557,19 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapBrushButton(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.selectBrush(inputType: .direct)
+                self.manipulationsModel?.selectBrush(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .draw)
+                self.manipulationsModel?.inkColor = self.lastToolColor
             }
         } else {
-            serializationModel?.selectBrush(inputType: .direct)
+            manipulationsModel?.selectBrush(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .draw)
+            manipulationsModel?.inkColor = lastToolColor
         }
         
         selectInkButton.isHidden = true
-        transformationTypeSegmentedControl.isHidden = true
-        serializationModel?.set(manipulationType: .draw)
         isSelectingInk = false
-        serializationModel?.inkColor = lastToolColor
+        self.transformationTypeSegmentedControl.isHidden = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -682,33 +590,24 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapPartialStrokeEraser(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel!.set(manipulationType: .intersect)
-                self.serializationModel?.inkColor = .white
-                
-                if self.isWholeStrokeOn {
-                    self.serializationModel?.toggleWholeStroke()
-                    self.isWholeStrokeOn = false
-                }
-                
-                self.selectInkButton.isHidden = true
-                self.transformationTypeSegmentedControl.isHidden = true
-                
-                self.isSelectingInk = false
+                self.manipulationsModel?.selectPartialStrokeEraser(inputType: .direct)
+                self.manipulationsModel!.set(manipulationType: .intersect)
+                self.manipulationsModel?.inkColor = .white
             }
         } else {
-            serializationModel!.set(manipulationType: .intersect)
-            serializationModel?.inkColor = .white
-            
-            if isWholeStrokeOn {
-                serializationModel?.toggleWholeStroke()
-                isWholeStrokeOn = false
-            }
-            
-            selectInkButton.isHidden = true
-            transformationTypeSegmentedControl.isHidden = true
-            
-            isSelectingInk = false
+            self.manipulationsModel?.selectPartialStrokeEraser(inputType: .direct)
+            manipulationsModel!.set(manipulationType: .intersect)
+            manipulationsModel?.inkColor = .white
         }
+        
+        if self.isWholeStrokeOn {
+            self.manipulationsModel?.toggleWholeStroke()
+            self.isWholeStrokeOn = false
+        }
+        
+        self.isSelectingInk = false
+        self.selectInkButton.isHidden = true
+        self.transformationTypeSegmentedControl.isHidden = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -729,33 +628,24 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapWholeStrokeEraser(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.set(manipulationType: .intersect)
-                self.serializationModel?.inkColor = .white
-                
-                if !self.isWholeStrokeOn {
-                    self.serializationModel?.toggleWholeStroke()
-                    self.isWholeStrokeOn = true
-                }
-                
-                self.selectInkButton.isHidden = true
-                self.transformationTypeSegmentedControl.isHidden = true
-                
-                self.isSelectingInk = false
+                self.manipulationsModel?.selectWholeStrokeEraser(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .intersect)
+                self.manipulationsModel?.inkColor = .white
             }
         } else {
-            serializationModel?.set(manipulationType: .intersect)
-            serializationModel?.inkColor = .white
-            
-            if !isWholeStrokeOn {
-                serializationModel?.toggleWholeStroke()
-                isWholeStrokeOn = true
-            }
-            
-            selectInkButton.isHidden = true
-            transformationTypeSegmentedControl.isHidden = true
-            
-            isSelectingInk = false
+            manipulationsModel?.selectWholeStrokeEraser(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .intersect)
+            manipulationsModel?.inkColor = .white
         }
+        
+        if !isWholeStrokeOn {
+            manipulationsModel?.toggleWholeStroke()
+            isWholeStrokeOn = true
+        }
+
+        isSelectingInk = false
+        selectInkButton.isHidden = true
+        self.transformationTypeSegmentedControl.isHidden = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -776,29 +666,29 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapPartialStrokeSelector(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.set(manipulationType: .select)
-                self.selectInkButton.isHidden = false
-                self.selectInkButton.setTitle("Select", for: .normal)
+                self.manipulationsModel?.selectPartialStrokeSelector(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .select)
+                self.manipulationsModel?.inkColor = .black
                 
-                if self.isWholeStrokeOn {
-                    self.serializationModel?.toggleWholeStroke()
-                    self.isWholeStrokeOn = false
-                }
-                
-                self.isSelectingInk = true
             }
         } else {
-            serializationModel?.set(manipulationType: .select)
-            selectInkButton.isHidden = false
-            selectInkButton.setTitle("Select", for: .normal)
-            
-            if isWholeStrokeOn {
-                serializationModel?.toggleWholeStroke()
-                isWholeStrokeOn = false
-            }
-            
-            isSelectingInk = true
+            manipulationsModel?.selectPartialStrokeSelector(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .select)
+            manipulationsModel?.inkColor = .black
         }
+        
+        if !self.isSelectingInk {
+            self.selectInkButton.setTitle("Select", for: .normal)
+        }
+        
+        self.selectInkButton.isHidden = false
+        
+        if self.isWholeStrokeOn {
+            self.manipulationsModel?.toggleWholeStroke()
+            self.isWholeStrokeOn = false
+        }
+        
+        self.isSelectingInk = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -819,29 +709,26 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     @IBAction func didTapWholeStrokeSelector(_ sender: UIButton) {
         if isDrawingStroke {
             queuedOperation = {
-                self.serializationModel?.set(manipulationType: .select)
-                self.selectInkButton.isHidden = false
-                self.selectInkButton.setTitle("Select", for: .normal)
-                
-                if !self.isWholeStrokeOn {
-                    self.serializationModel?.toggleWholeStroke()
-                    self.isWholeStrokeOn = true
-                }
-                
-                self.isSelectingInk = true
+                self.manipulationsModel?.selectWholeStrokeSelector(inputType: .direct)
+                self.manipulationsModel?.set(manipulationType: .select)
             }
         } else {
-            serializationModel?.set(manipulationType: .select)
-            selectInkButton.isHidden = false
-            selectInkButton.setTitle("Select", for: .normal)
-            
-            if !isWholeStrokeOn {
-                serializationModel?.toggleWholeStroke()
-                isWholeStrokeOn = true
-            }
-            
-            isSelectingInk = true
+            manipulationsModel?.selectWholeStrokeSelector(inputType: .direct)
+            manipulationsModel?.set(manipulationType: .select)
         }
+        
+        if !self.isSelectingInk {
+            self.selectInkButton.setTitle("Select", for: .normal)
+        }
+        
+        self.selectInkButton.isHidden = false
+        
+        if !self.isWholeStrokeOn {
+            self.manipulationsModel?.toggleWholeStroke()
+            self.isWholeStrokeOn = true
+        }
+        
+        self.isSelectingInk = true
         
         penButton.backgroundColor = .white
         penButton.layer.cornerRadius = 0
@@ -872,12 +759,11 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
             defer { url.stopAccessingSecurityScopedResource() }
             
             if url.pathExtension == "uim" {
-                if serializationModel?.hasRasterInk(url: url) ?? false {
+                if manipulationsModel?.hasRasterInk(url: url) ?? false {
                     let alertController = UIAlertController(title: "Raster ink in vector canvas", message: "The ink model you are trying to load contains raster ink. Ink manipulation is disabled.", preferredStyle: .alert)
                     let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                     alertController.addAction(alertAction)
-                    try! serializationModel!.load(url: url, viewLayer: view.layer)
-                    isRTreeLeavesShowHandler()
+                    try! manipulationsModel!.load(url: url, viewLayer: view.layer)
                     interactionEnabled = false
                     
                     if isSelectingTool {
@@ -894,8 +780,7 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     
                     present(alertController, animated: true, completion: nil)
                 } else {
-                    try! serializationModel!.load(url: url, viewLayer: view.layer)
-                    isRTreeLeavesShowHandler()
+                    try! manipulationsModel!.load(url: url, viewLayer: view.layer)
                     interactionEnabled = true
                 }
             } else {
@@ -944,16 +829,16 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
                     do {
                         switch self.fileExtension {
                         case "uim":
-                            try self.serializationModel!.save(urlToSave)//, name: saveNameFile)
+                            try self.manipulationsModel!.save(urlToSave)//, name: saveNameFile)
                             print("Saved successfully in \(urlToSave.path)")
                         case "pdf":
-                            try self.serializationModel?.savePDF(urlToSave)
+                            try self.manipulationsModel?.savePDF(urlToSave)
                             print("Saved successfully in \(urlToSave.path)")
                         case "svg":
-                            try self.serializationModel?.saveSVG(urlToSave)
+                            try self.manipulationsModel?.saveSVG(urlToSave)
                             print("Saved successfully in \(urlToSave.path)")
                         case "png":
-                            try self.serializationModel?.savePNG(urlToSave)
+                            try self.manipulationsModel?.savePNG(urlToSave)
                             print("Saved successfully in \(urlToSave.path)")
                         default:
                             print("unknown file extension")
@@ -977,40 +862,46 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
         }
     }
     
-    @objc func selectSpatialContext(control: UISegmentedControl) {
-        selectSpatialContextHandler()
-    }
-
-    @objc func selectManipulation(control: UISegmentedControl) {
-        selectManipulationHandler()
-    }
-
-    @objc func selectCollectionType(control: UISegmentedControl) {
-        selectCollectionTypeHandler()
-    }
-
-    @objc func selectTransformaion(control: UISegmentedControl) {
-        selectTransformationHandler()
-    }
-
-    @objc func intersectBrushSizeSliderChanged(sliderChanged: UISlider) {
-        intersectBrushSizeSliderHandler()
-    }
-
-    @objc func isRTreeLeavesShowSwitchStateChanged(switchState: UISwitch) {
-        isRTreeLeavesShowHandler()
-    }
-    
-    @objc func isWholeStrokeSwitchStateChanged(switchState: UISwitch) {
-        isRTreeWholeStrokeSwitchHandler()
-    }
-    
-    @objc func selectOverlap(control: UISegmentedControl) {
-        selectOverlapModeHandler()
+    func clickSaveButtonHandler() throws {
+        //let validate = saveModel!.validate()
+        if saveModel!.isValid {//, fileName = fileNameTextField.text {
+            
+            var urlToSave = saveModel!.selectedFolderURL!.appendingPathComponent("\(saveModel!.selectedFileName!).uim")
+            if urlToSave.checkFileExist() {
+                let date = Date()
+                let format = DateFormatter()
+                format.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                let formattedDate = format.string(from: date)
+                urlToSave = saveModel!.selectedFolderURL!.appendingPathComponent("\(saveModel!.selectedFileName!)_\(formattedDate).uim")
+            }
+            
+            guard saveModel!.selectedFolderURL!.startAccessingSecurityScopedResource() else {
+                // Handle the failure here.
+                assert(false, "Could not access security scoped context")
+                return
+            }
+            
+            defer { saveModel!.selectedFolderURL!.stopAccessingSecurityScopedResource() }
+            
+            try manipulationsModel!.save(urlToSave)//, name: saveNameFile)
+            print("Saved successfully")
+        } else {
+            print("saveModel?.validateMessage -> \(saveModel?.validateMessage)")
+        }
     }
     
-    @objc func isErasingChanged(switchState: UISwitch) {
-        isErasingHandler()
+    func clickLoadButtonHandler() {
+        let documentPicker: UIDocumentPickerViewController!
+        
+        documentPicker =  UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
+        isLoad = true
+        documentPicker.delegate = self
+        
+        present(documentPicker, animated: true, completion: nil)
+    }
+    
+    @objc func selectTransformaion() {
+        manipulationsModel?.set(transformationType: TransformationType(rawValue: transformationTypeSegmentedControl.selectedSegmentIndex)!)
     }
     
     @objc func clickSelectionButton(sender: UIButton) {
@@ -1038,24 +929,22 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
     }
     
     private func setSelectionButton() {
-        if serializationModel!.hasSelection {
-            transformationTypeSegmentedControl.isHidden = false
+        if manipulationsModel!.hasSelection {
             selectInkButton.isHidden = false
             selectInkButton.setTitle("Deselect", for: .normal)
             
             view.addGestureRecognizer(rotateGestureRecognizer!)
-            isRTreeLeavesShowHandler()
-        }
-        else {
+            self.transformationTypeSegmentedControl.isHidden = false
+        } else {
             selectInkButton.setTitle("Select", for: .normal)
-            transformationTypeSegmentedControl.isHidden = true
             
             view.removeGestureRecognizer(rotateGestureRecognizer!)
+            self.transformationTypeSegmentedControl.isHidden = true
         }
     }
     
     private func clickSelectionButtonHandler() {
-        if serializationModel!.onSelectButton(view: view) {
+        if try! manipulationsModel!.onSelectButton(view: view) {
             setSelectionButton()
         } else {
             let alertController = UIAlertController(title: "Insufficient data", message:
@@ -1065,98 +954,4 @@ class ManipulationsQaurtz2DController : UIViewController, UIDocumentPickerDelega
             self.present(alertController, animated: true, completion: nil)
         }
     }
-    
-    private func selectSpatialContextHandler() {
-        serializationModel!.set(spatialContextType: DemosSpatialContextType(rawValue: spatialContextSegmentedControl!.selectedSegmentIndex)!)
-        isRTreeLeavesShowHandler()
-    }
-    
-    private func selectManipulationHandler() {
-        serializationModel!.set(manipulationType: ManipulationType(rawValue: manipulationTypeSegmentedControl!.selectedSegmentIndex)!)
-        if serializationModel!.selectedManipulationType == ManipulationType.draw {
-            intersectBrushSizeLabel.isHidden = true
-            intersectBrushSizeSlider.isHidden = true
-            isErasingLabel.isHidden = true
-            isErasingSwitch.isHidden = true
-            isRTreeWholeStrokeLabel.isHidden = true
-            isRTreeWholeStrokeSwitch.isHidden = true
-            manipulatorCollectionTypeSegmentedControl.isHidden = true
-            selectionButton.isHidden = true
-            selectionOverlapModeSegmentedControl.isHidden = true
-            transformationTypeSegmentedControl.isHidden = true
-
-        } else if serializationModel!.selectedManipulationType == ManipulationType.intersect {
-            intersectBrushSizeLabel.isHidden = false
-            intersectBrushSizeSlider.isHidden = false
-            isErasingLabel.isHidden = false
-            isErasingSwitch.isHidden = false
-            isRTreeWholeStrokeLabel.isHidden = false
-            isRTreeWholeStrokeSwitch.isHidden = false
-            manipulatorCollectionTypeSegmentedControl.isHidden = false//isRTreeWholeStrokeSwitch.isOn
-            selectionButton.isHidden = true
-            transformationTypeSegmentedControl.isHidden = true
-            selectionOverlapModeSegmentedControl.isHidden = true
-
-        } else if serializationModel!.selectedManipulationType == ManipulationType.select {
-            intersectBrushSizeLabel.isHidden = true
-            intersectBrushSizeSlider.isHidden = true
-            isErasingLabel.isHidden = true
-            isErasingSwitch.isHidden = true
-            isRTreeWholeStrokeLabel.isHidden = false
-            isRTreeWholeStrokeSwitch.isHidden = false
-            manipulatorCollectionTypeSegmentedControl.isHidden = false
-            selectionButton.isHidden = false
-            selectionOverlapModeSegmentedControl.isHidden = isRTreeWholeStrokeSwitch.isOn
-            setSelectionButton()
-        }
-
-        setTitle()
-    }
-
-    private func selectCollectionTypeHandler() {
-        serializationModel!.set(manipulatorCollectionType: ManipulatorCollectionType(rawValue: manipulatorCollectionTypeSegmentedControl.selectedSegmentIndex)!)
-    }
-    
-    private func selectTransformationHandler() {
-        serializationModel!.set(transformationType: ManipulationAction(rawValue: transformationTypeSegmentedControl!.selectedSegmentIndex)!)
-    }
-    
-    public func isRTreeLeavesShowHandler() {
-        countNodes = 0
-        showRtreeNodes(isToShow: isRTreeLeavesShowSwitch.isOn, numberOfNodes: &countNodes)
-        setTitle()
-    }
-    
-    private func intersectBrushSizeSliderHandler() {
-        setTitle()
-        //serializationModel!.setDefault(size: intersectBrushSizeSlider.value)
-    }
-    
-    private func isRTreeWholeStrokeSwitchHandler() {
-        selectionOverlapModeSegmentedControl.isHidden = !(serializationModel!.selectedManipulationType == ManipulationType.select) || isRTreeWholeStrokeSwitch.isOn
-        serializationModel!.toggleWholeStroke()
-    }
-    
-    private func selectOverlapModeHandler() {
-        serializationModel!.set(selectOverlapMode: Manipulator.OverlapMode(rawValue: UInt32(selectionOverlapModeSegmentedControl.selectedSegmentIndex))!)
-    }
-    
-    private func isErasingHandler() {
-        serializationModel!.toggleIsErasing()
-    }
-    
-    private func setTitle() {
-        if serializationModel!.selectedManipulationType == ManipulationType.draw {
-            title = "\(isRTreeLeavesShowSwitch.isOn ? " (leaves# \(countNodes))" : "")"
-        } else if serializationModel!.selectedManipulationType == ManipulationType.intersect {
-            title = "size \(intersectBrushSizeSlider.value) \(isRTreeLeavesShowSwitch.isOn ? " (leaves# \(countNodes))" : "")"
-        } else {
-            title = "\(isRTreeLeavesShowSwitch.isOn ? " (leaves# \(countNodes))" : "")"
-        }
-    }
 }
-
-
-
-
-
