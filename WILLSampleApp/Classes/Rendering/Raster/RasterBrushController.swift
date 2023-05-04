@@ -26,7 +26,7 @@ class RasterBrushController: RedrawController
         super.viewDidLoad()
         
         let particleBrush = Pencil().particleBrush(graphics: graphics)
-        renderingModel = RasterBrushModel(RasterInkBuilder(), .max, particleBrush: particleBrush)
+        renderingModel = RasterBrushModel(try! StockRasterInkBuilder(), .max, particleBrush: particleBrush)
         (renderingModel as! RasterBrushModel).selectPencil(inputType: .direct, graphics: graphics)
         
         pencilButton.layer.cornerRadius = pencilButton.frame.width / 3

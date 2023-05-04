@@ -13,47 +13,48 @@ extension ApplicationModel {
         let resultInkModel: InkModel = InkModel()
         
         for device in devices.values {
-            try resultInkModel.inputConfiguration.devices.add(item: device)
+            _ = try resultInkModel.inputConfiguration.devices.tryAdd(item: device)
         }
         
         for environment in environments.values {
-            try resultInkModel.inputConfiguration.environments.add(item: environment)
+            _ = try resultInkModel.inputConfiguration.environments.tryAdd(item: environment)
         }
         
         for inkInputProvider in inkInputProviders.values {
-            try resultInkModel.inputConfiguration.inkInputProviders.add(item: inkInputProvider)
+            _ = try resultInkModel.inputConfiguration.inkInputProviders.tryAdd(item: inkInputProvider)
         }
         
         for inputContext in inputContexts.values {
-            try resultInkModel.inputConfiguration.inputContexts.add(item: inputContext)
+            _ = try resultInkModel.inputConfiguration.inputContexts.tryAdd(item: inputContext)
         }
         
         for sensorContext in sensorContexts.values {
-            try resultInkModel.inputConfiguration.sensorContexts.add(item: sensorContext)
+            _ = try resultInkModel.inputConfiguration.sensorContexts.tryAdd(item: sensorContext)
         }
         
         try resultInkModel.inkTree.setRoot(newValue: StrokeGroupNode(id: Identifier.fromNewUUID()!))
         if let applicationStrokes = strokes.values {
             for applicationStroke in applicationStrokes {
-                let vectorBrush = applicationStroke.inkStroke.getSerializationVectorBrush();
+                let vectorBrush = try applicationStroke.inkStroke.getSerializationVectorBrush();
+            
                 
                 if resultInkModel.brushes.tryGetBrush(brushName: vectorBrush.name) == nil {
                     try resultInkModel.brushes.addVectorBrush(vectorBrush: vectorBrush);
                 }
                 
-                let style = applicationStroke.inkStroke.getSerializationStyle(brushName: vectorBrush.name);
+                let style = try applicationStroke.inkStroke.getSerializationStyle(brushName: vectorBrush.name);
                 
                 let stroke = Stroke(
                     Identifier.fromNewUUID()!,
                     applicationStroke.inkStroke.spline,
                     style,
-                    applicationStroke.sensorDataId,  //?? Identifier.empty,
+                    applicationStroke.sensorDataId,
                     sensorDataOffset: applicationStroke.inkStroke.sensorDataOffset,
                     sensorDataMappings: applicationStroke.inkStroke.sensorDataMappings
                 )
                 
                 
-                let strokeNode = try StrokeNode(stroke)// Fix using strokeFragment test)//Identifier.fromNewUUID(), stroke);
+                let strokeNode = try StrokeNode(stroke)
                 _ = try resultInkModel.inkTree.root!.childNodes.add(node: strokeNode);
                 if let sensorDataIdentifier = applicationStroke.sensorDataId {
                     let sensorData = sensorDataMaps[sensorDataIdentifier]!
@@ -74,7 +75,7 @@ extension ApplicationModel {
         if skip { return }
         
         if stroke.sensorDataId == nil {
-            throw "No sensorDataId for stroke \(stroke.id)"
+            throw RuntimeError("No sensorDataId for stroke \(stroke.id)")
         }
         
         let sensorData = sensorDataMaps[stroke.sensorDataId!]!
@@ -84,9 +85,9 @@ extension ApplicationModel {
         
         let sensorChannelXData = sensorData.allChannelData[xChannel.id]!.map({ covertToFloat($0, Float(xChannel.precision))})
         let sensorChannelYData = sensorData.allChannelData[yChannel.id]!.map({ covertToFloat($0, Float(yChannel.precision))})
-        let layout = try PathPointLayout(layoutMask: stroke.getSpline().layoutMask)
-        let strokeXData = try stroke.getCoordsList(property: PathPoint.Property.x, layout: layout)!
-        let strokeYData = try stroke.getCoordsList(property: PathPoint.Property.y, layout: layout)!
+        
+        let strokeXData = try stroke.getCoordsList(property: PathPoint.Property.x)
+        let strokeYData = try stroke.getCoordsList(property: PathPoint.Property.y)
         let strokeDataCount = strokeXData.count
         
         let sensorDataOffset = Int(stroke.sensorDataOffset)

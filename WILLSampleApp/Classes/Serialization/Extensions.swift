@@ -182,3 +182,138 @@ extension UIImage {
     return UIGraphicsGetImageFromCurrentImageContext() ?? self
   }
 }
+
+extension StockRasterInkBuilder {
+    func updatePipeline(layout: LayoutMask, calculator: @escaping Calculator, spacing: Float) {
+        do {
+            try self.pathProducer.setLayoutMask(layout)
+            try self.pathProducer.setPathPointCalculator(newValue: calculator)
+            
+            try splineInterpolator.setSpacing(newValue: spacing)
+            splineInterpolator.splitCount = 8
+        } catch let error {
+            print("ERROR: \(error)")
+        }
+    }
+}
+
+extension SampleVectorInkBuilder {
+    public func updateVectorInkPipeline(layoutMask: LayoutMask, calculator: @escaping Calculator ,brush: Geometry.VectorBrush, constSize: Float = 1.0, constRotation: Float = 0.0, scaleX: Float = 1.0, scaleY: Float = 1.0, offsetX: Float = 0.0, offsetY: Float  = 0.0) throws {
+        try self.pathProducer.setLayoutMask(layoutMask)
+        try self.pathProducer.setPathPointCalculator(newValue: calculator)
+        try self.brushApplier.setPrototype(newValue: brush)
+        
+        self.brushApplier.defaultSize = constSize;
+        self.brushApplier.defaultRotation = constRotation;
+        self.brushApplier.defaultScale = DIFloat3(scaleX, scaleY, 1)
+        self.brushApplier.defaultOffset = DIFloat3(offsetX, offsetY, 0.0);
+    }
+    
+    func getBezierPathBy(spline: Spline, inkPipeline: InkPipeline) throws {
+//        let splineInterpolatorResult = try splineInterpolator.add(isFirst: true, isLast: true, addition: spline, prediction: nil)
+//
+//        let addedPolysResult = try brushApplier.add(isFirst: true, isLast: true, addition: splineInterpolatorResult.addition, prediction: nil)
+//        
+//        let addedHullsResult = try convexHullChainProducer.add(isFirst: true, isLast: true, addition: addedPolysResult.addition, prediction: nil)
+//        
+//        let addedMergedResult = try polygonMerger.add(isFirst: true, isLast: true, addition: addedHullsResult.addition, prediction: nil)
+        
+        inkPipeline.reset()
+        
+        _ = try splineToPolygon(spline: spline)
+        
+        try inkPipeline.process()
+//        let addedSimplifiedResult = try polygonSimplifier.add(isFirst: true, isLast: true, addition: addedMergedResult.addition, prediction: nil)
+//
+//        let addedBezierResult = try bezierpathProducer.add(isFirst: true, isLast: true, addition: addedSimplifiedResult.addition, prediction: nil)
+        
+        //return addedBezierResult.addition
+    }
+}
+
+extension PointerDataProvider {
+    func add(phase: Phase, touches: Set<UITouch>, event: UIEvent, view: UIView) {
+        switch phase {
+        case .begin:
+            if touches.count != 1 {
+                NSException(name:NSExceptionName(rawValue: "VectorInkBuilderUpdatedPipeline.add ,"), reason:"touches count is diff from 1 in .begin phase", userInfo:nil).raise()
+            }
+            let touchData = getTouchDataBy(phase: phase, touch: touches.first!, view: view)
+                        
+            do
+            {
+                try self.add(addition: touchData)
+            }
+            catch {
+                NSException(name:NSExceptionName(rawValue: "VectorInkBuilderUpdatedPipeline.add ,"), reason:"\(error)", userInfo:nil).raise()
+            }
+            
+        case .end:
+            addTouchImpl(phase: phase, touches: touches, event: event, view: view)
+        default:
+            addTouchImpl(phase: phase, touches: touches, event: event, view: view)
+        }
+    }
+    
+    private func getTouchDataBy(phase: Phase, touch: UITouch, view: UIView) -> PointerData {
+        let location = touch.location(in: view)
+        let x: Float = Float(location.x)
+        let y: Float = Float(location.y)
+        let force: Float = Float(touch.force)
+        let azymuthAngle: Float = Float(touch.azimuthAngle(in: view))
+        let altitudeAngle: Float = Float(touch.altitudeAngle)
+       
+        var result = PointerData(phase:phase, timestamp: touch.timestamp, x: x, y: y, force: force)
+        result.azimuthAngle = azymuthAngle
+        result.altitudeAngle = altitudeAngle
+        
+        return result
+    }
+    
+    private func addTouchImpl(phase: Phase, touches: Set<UITouch>, event: UIEvent, view: UIView) {
+        let sortedTouches: [UITouch] = touches.sorted(by: {$0.timestamp < $1.timestamp})
+        let size:Int = touches.count
+        
+        for i in 1..<touches.count {
+            let touch = sortedTouches[size - i]
+            let touchData = getTouchDataBy(phase: .update, touch: touch, view: view)
+
+            if (i != touches.count - 1) {
+                print(", ")
+            }
+                
+                
+            do {
+                try self.add(addition: touchData)
+            } catch {
+                NSException(name:NSExceptionName(rawValue: "InkBuilder.add"), reason:"\(error)", userInfo:nil).raise()
+            }
+        }
+        
+        let touch = sortedTouches[0]
+        let touchData = getTouchDataBy(phase: phase == .end ? .end : .update, touch: touch, view: view)
+
+        var predictedeTouchData: PointerData! = nil
+        
+        if let predictedTouches = event.predictedTouches(for: touch), let predictedTouch = predictedTouches.last {
+            predictedeTouchData = getTouchDataBy(phase: .end, touch: predictedTouch, view: view)            
+        }
+        
+        do {
+            try add(touchData, predictedeTouchData)
+        } catch {
+            NSException(name:NSExceptionName(rawValue: "InkBuilder.add"), reason:"\(error)", userInfo:nil).raise()
+        }
+    }
+    
+    private func add(_ touchData: PointerData?,_ predictedeTouchData: PointerData?) throws {
+        if let addition = touchData {
+            try self.add(addition: addition)
+        }
+        
+        if let prediction = predictedeTouchData {
+            self.setPrediction(prediction: prediction)
+        }
+    }
+
+}

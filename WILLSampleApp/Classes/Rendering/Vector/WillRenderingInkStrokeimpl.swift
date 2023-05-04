@@ -12,12 +12,14 @@ class WillRendering {
     class InkStrokeFactory : InkStrokeFactoryProtocol {
         func createStroke(_ newSpline: Spline, _ originalStroke: InkStrokeProtocol, inkStrokeId: Identifier?, firstPointIndex: UInt32, pointsCount: UInt32) -> InkStrokeProtocol {
             let identifier = inkStrokeId ?? Identifier.fromNewUUID()
-            let resultStroke = InkStroke(
-                identifier: identifier!,
-                spline: newSpline,
-                layout: originalStroke.layout,
-                vectorBrush: originalStroke.vectorBrush,
-                constants: originalStroke.constants as! WillRendering.ConstantAttributes)
+            
+            let resultStroke = InkStroke(identifier: identifier!, spline: newSpline, vectorBrush: originalStroke.vectorBrush, constants: originalStroke.constants as! WillRendering.ConstantAttributes)
+//            let resultStroke = InkStroke(
+//                identifier: identifier!,
+//                spline: newSpline,
+//                layout: originalStroke.layout,
+//                vectorBrush: originalStroke.vectorBrush,
+//                constants: originalStroke.constants as! WillRendering.ConstantAttributes)
             
             return resultStroke
         }
@@ -78,10 +80,10 @@ class WillRendering {
     }
 
     public class InkStroke : InkStrokeProtocol {
+        public var layoutMask: LayoutMask
         public var id: Identifier
         public var constants: StrokeAttributesProtocol = ConstantAttributes()
         public var spline: Spline
-        public var layout: PathPointLayout
         public var vectorBrush: Geometry.VectorBrush
         public var sensorDataOffset: UInt32 = 0
         public var sensorDataMappings: [UInt32] = []
@@ -89,14 +91,14 @@ class WillRendering {
         public init(
             identifier: Identifier,
             spline: Spline,
-            layout: PathPointLayout,
             vectorBrush: Geometry.VectorBrush,
-            constants: ConstantAttributes) {
-            self.id = identifier
-            self.spline = spline
-            self.layout = layout
-            self.vectorBrush = vectorBrush
-            self.constants = constants
+            constants: ConstantAttributes,
+            layoutMask: LayoutMask? = nil) {
+                self.id = identifier
+                self.spline = spline
+                self.vectorBrush = vectorBrush
+                self.constants = constants
+                self.layoutMask = layoutMask ?? LayoutMask(arrayLiteral: [.x, .y])
         }
     }
 }

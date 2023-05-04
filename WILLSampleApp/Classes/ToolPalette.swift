@@ -15,13 +15,13 @@ protocol RasterTool {
     
     func particleBrush(graphics: Graphics?) -> ParticleBrush
     func getCalculator(inputType: UITouch.TouchType) -> Calculator?
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout?
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask?
 }
 
 protocol VectorTool {
     func brush() -> ExtendedVectorBrush
     func getCalculator(inputType: UITouch.TouchType) -> Calculator?
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout?
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask?
     func getURIs() -> [BrushPolygonUri]
 }
 
@@ -105,11 +105,11 @@ class Pen: VectorTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size])
+            return LayoutMask([.x, .y, .size])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size])
+            return LayoutMask([.x, .y, .size])
         }
         
         return nil
@@ -209,11 +209,11 @@ class Felt: VectorTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size])
+            return LayoutMask([.x, .y, .size])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .rotation, .scaleX, .offsetX])
+            return LayoutMask([.x, .y, .size, .rotation, .scaleX, .offsetX])
         }
         
         return nil
@@ -312,13 +312,205 @@ class Brush: VectorTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size])
+            return LayoutMask([.x, .y, .size])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .rotation, .scaleX, .offsetX])
+            return LayoutMask([.x, .y, .size, .rotation, .scaleX, .offsetX])
         }
         
+        return nil
+    }
+}
+
+class PartialStrokeEraser: VectorTool {
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Brush")
+    }
+
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
+    }
+
+    func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
+        if inputType == .direct {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 10
+
+                return pathPoint
+            }
+        } else if inputType == .pencil {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 10
+
+                return pathPoint
+            }
+        }
+
+        return nil
+    }
+
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
+        if inputType == .direct {
+            return LayoutMask([.x, .y, .size])
+        } else if inputType == .pencil {
+            return LayoutMask([.x, .y, .size])
+        }
+
+        return nil
+    }
+}
+
+class WholeStrokeEraser: VectorTool {
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Brush")
+    }
+
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
+    }
+
+    func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
+        if inputType == .direct {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 10
+
+                return pathPoint
+            }
+        } else if inputType == .pencil {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 10
+
+                return pathPoint
+            }
+        }
+
+        return nil
+    }
+
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
+        if inputType == .direct {
+            return LayoutMask([.x, .y, .size])
+        } else if inputType == .pencil {
+            return LayoutMask([.x, .y, .size])
+        }
+
+        return nil
+    }
+}
+
+class PartialStrokeSelector: VectorTool {
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Brush")
+    }
+
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
+    }
+
+    func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
+        if inputType == .direct {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 1
+
+                return pathPoint
+            }
+        } else if inputType == .pencil {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 1
+
+                return pathPoint
+            }
+        }
+
+        return nil
+    }
+
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
+        if inputType == .direct {
+            return LayoutMask([.x, .y, .size])
+        } else if inputType == .pencil {
+            return LayoutMask([.x, .y, .size])
+        }
+
+        return nil
+    }
+}
+
+class WholeStrokeSelector: VectorTool {
+    func brush() -> ExtendedVectorBrush {
+        return ExtendedVectorBrush(vectorBrush: try! Geometry.VectorBrush(polygons: [
+            BrushPolygon.createNormalized(minScale: 0, points: BrushApplier.createUnitCirclePolygon(verticesCount: 4)),
+            BrushPolygon.createNormalized(minScale: 2, points: BrushApplier.createUnitCirclePolygon(verticesCount: 8)),
+            BrushPolygon.createNormalized(minScale: 6, points: BrushApplier.createUnitCirclePolygon(verticesCount: 16)),
+            BrushPolygon.createNormalized(minScale: 8, points: BrushApplier.createUnitCirclePolygon(verticesCount: 32))
+        ]), name: "Brush")
+    }
+
+    func getURIs() -> [BrushPolygonUri] {
+        return [try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=4&radius=0.5", minScale: 0),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=8&radius=0.5", minScale: 2),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=16&radius=0.5", minScale: 6),
+                try! BrushPolygonUri(shapeUri: "will://brush/3.0/shape/Circle?precision=32&radius=0.5", minScale: 8)]
+    }
+
+    func getCalculator(inputType: UITouch.TouchType) -> Calculator? {
+        if inputType == .direct {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 1
+
+                return pathPoint
+            }
+        } else if inputType == .pencil {
+            return { previous, current, next in
+                var pathPoint = PathPoint(x: current!.x, y: current!.y)
+                pathPoint.size = 1
+
+                return pathPoint
+            }
+        }
+
+        return nil
+    }
+
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
+        if inputType == .direct {
+            return LayoutMask([.x, .y, .size])
+        } else if inputType == .pencil {
+            return LayoutMask([.x, .y, .size])
+        }
+
         return nil
     }
 }
@@ -387,15 +579,15 @@ class Pencil: RasterTool {
             }
         } else if inputType == .pencil {
             return { previous, current, next in
-                let cosAltitudeAngle = cos(current!.altitudeAngle!)
-                let sinAzimuthAngle = sin(current!.azimuthAngle!)
-                let cosAzimuthAngle = cos(current!.azimuthAngle!)
+//                let cosAltitudeAngle = cos(current!.altitudeAngle!)
+//                let sinAzimuthAngle = sin(current!.azimuthAngle!)
+//                let cosAzimuthAngle = cos(current!.azimuthAngle!)
                 
                 // calculate the offset of the pencil tip due to tilted position
-                let x = sinAzimuthAngle * cosAzimuthAngle
-                let y = cosAltitudeAngle * cosAzimuthAngle
-                let offsetX = 5 * -y
-                let offsetY = 5 * -x
+//                let x = sinAzimuthAngle * cosAzimuthAngle
+//                let y = cosAltitudeAngle * cosAzimuthAngle
+//                let offsetX = 5 * -y
+//                let offsetY = 5 * -x
                 
                 let rotation = current!.computeNearestAzimuthAngle(previous: previous)
                 // now, based on the tilt of the pencil the size of the brush is increasing, as the pencil tip is covering a larger area
@@ -446,11 +638,11 @@ class Pencil: RasterTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .alpha, .offsetX, .offsetY])
+            return LayoutMask([.x, .y, .size, .alpha, .offsetX, .offsetY])
         }
         
         return nil
@@ -458,7 +650,7 @@ class Pencil: RasterTool {
 }
 
 class WaterBrush: RasterTool {
-    var particleSpacing: Float = 0.0
+    var particleSpacing: Float = 0.01
     
     func particleBrush(graphics: Graphics?) -> ParticleBrush {
         let brush = ParticleBrush()
@@ -544,11 +736,11 @@ class WaterBrush: RasterTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .rotation, .offsetX, .offsetY, .alpha])
+            return LayoutMask([.x, .y, .size, .rotation, .offsetX, .offsetY, .alpha])
         }
         
         return nil
@@ -558,7 +750,7 @@ class WaterBrush: RasterTool {
 }
 
 class Crayon: RasterTool {
-    var particleSpacing: Float = 0.0
+    var particleSpacing: Float = 0.01
     
     func particleBrush(graphics: Graphics?) -> ParticleBrush {
         let brush = ParticleBrush()
@@ -584,7 +776,7 @@ class Crayon: RasterTool {
                                                              maxSpeed: 1400,
                                                              remap: nil)
                 
-                if size == 0 {
+                if size == nil {
                     size = 1
                 }
                 
@@ -598,10 +790,9 @@ class Crayon: RasterTool {
                                                               maxSpeed: 1400,
                                                               remap: nil)
                 
-                if alpha == 0 {
+                if alpha == nil {
                     alpha = 1
                 }
-                
                 
                 var pathPoint = PathPoint(x: current!.x, y: current!.y)
                 pathPoint.size = size
@@ -644,11 +835,11 @@ class Crayon: RasterTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         }
         
         return nil
@@ -656,7 +847,7 @@ class Crayon: RasterTool {
 }
 
 class RasterEraser: RasterTool {
-    var particleSpacing: Float = 0.0
+    var particleSpacing: Float = 0.001
     
     func particleBrush(graphics: Graphics?) -> ParticleBrush {
         let shapeView = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
@@ -712,11 +903,11 @@ class RasterEraser: RasterTool {
         return nil
     }
     
-    func getLayout(inputType: UITouch.TouchType) -> PathPointLayout? {
+    func getLayout(inputType: UITouch.TouchType) -> LayoutMask? {
         if inputType == .direct {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         } else if inputType == .pencil {
-            return PathPointLayout([.x, .y, .size, .alpha])
+            return LayoutMask([.x, .y, .size, .alpha])
         }
         
         return nil
@@ -736,6 +927,10 @@ class ToolPalette {
     let pen = Pen()
     let felt = Felt()
     let brush = Brush()
+    let partialStrokeEraser = PartialStrokeEraser()
+    let wholeStrokeEraser = WholeStrokeEraser()
+    let partialStrokeSelector = PartialStrokeSelector()
+    let wholeStrokeSelector = WholeStrokeSelector()
     
     var selectedRasterTool: RasterTool?
     var selectedVectorTool: VectorTool?

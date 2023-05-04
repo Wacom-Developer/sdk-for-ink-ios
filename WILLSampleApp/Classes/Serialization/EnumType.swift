@@ -55,7 +55,7 @@ enum DemosSpatialContextType: Int, CustomStringConvertible {
     }
 }
 
-enum ManipulationAction: Int, CustomStringConvertible {
+enum TransformationType: Int, CustomStringConvertible {
     case move = 0
     case rotate
     
@@ -73,7 +73,7 @@ enum ManipulationAction: Int, CustomStringConvertible {
             return "Move"
         case .rotate:
             return "Rotate"
-        } 
+        }
     }
 }
 
@@ -99,3 +99,13 @@ enum ManipulatorCollectionType: Int, CustomStringConvertible {
     }
 }
 
+internal class Predicates {
+    internal static var manipulation = "wt:manipulation";
+}
+
+internal enum TestManipulationType: String {
+    case ErasePartialStroke = "ErasePartialStroke"
+    case EraseWholeStroke = "EraseWholeStroke"
+    case SelectPartialStroke = "SelectPartialStroke"
+    case SelectWholeStroke = "SelectWholeStroke"
+}

@@ -24,7 +24,7 @@ class BrushFactory {
     }
 }
 
-class URIBuilder {
+extension URIBuilder {
     static func getBrushURI(type: String, name: String) -> String {
         return "app://com.wacom.will3sample/\(type)-brush/\(name)"
     }

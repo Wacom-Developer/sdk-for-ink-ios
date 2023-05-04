@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FXr-ly-87B">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FXr-ly-87B">
     <device id="ipad10_5" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,7 +21,7 @@
                                 <rect key="frame" x="760" y="1038" width="44" height="44"/>
                                 <state key="normal" image="btn_clear"/>
                                 <connections>
-                                    <action selector="didTapClearAll:" destination="BYZ-38-t0r" eventType="touchUpInside" id="F4l-nB-cgQ"/>
+                                    <action selector="didTapClearAll:" destination="BYZ-38-t0r" eventType="touchUpInside" id="H0F-VO-lQH"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m1Y-Ln-LwZ">
@@ -304,8 +304,7 @@
                                 <rect key="frame" x="760" y="1038" width="44" height="44"/>
                                 <state key="normal" image="btn_clear"/>
                                 <connections>
-                                    <action selector="didTapClearAll:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GSy-tI-QRV"/>
-                                    <action selector="didTapResetAll:" destination="pm6-kp-hdK" eventType="touchUpInside" id="7Zf-TY-c7C"/>
+                                    <action selector="didTapClearAll:" destination="pm6-kp-hdK" eventType="touchUpInside" id="2MU-An-46C"/>
                                 </connections>
                             </button>
                         </subviews>

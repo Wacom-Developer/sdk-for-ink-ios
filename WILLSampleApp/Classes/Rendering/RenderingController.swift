@@ -42,7 +42,7 @@ protocol RenderingProtocol {
 }
 
 class RenderingModel: RenderingProtocol {
-    var ink: InkBuilder?
+    var ink: StockRasterInkBuilder?
     var preliminary: UIColor?
     var inkColor: UIColor = UIColor.clear
     var defaultSize: Float = 0.0
@@ -158,26 +158,33 @@ class RenderingController: UIViewController {
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         (renderingModel as? RasterBrushModel)?.touchesBegan(touches, with: event, graphics: graphics!)
         
-        renderingModel!.ink!.add(phase: .begin, touches: touches, event: event!, view: view)
+        renderingModel?.ink?.pointerDataProvider.add(phase: .begin, touches: touches, event: event!, view: view)
+        //renderingModel!.ink!.add(phase: .begin, touches: touches, event: event!, view: view)
         
         renderingModel!.touchesBeganBody()
     }
     
     override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        renderingModel!.ink!.add(phase: .update, touches: touches, event: event!, view: view)
+        renderingModel?.ink?.pointerDataProvider.add(phase: .update, touches: touches, event: event!, view: view)
+        //renderingModel!.ink!.add(phase: .update, touches: touches, event: event!, view: view)
     }
     
     override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        renderingModel!.ink!.add(phase: .end, touches: touches, event: event!, view: view)
-        
-        renderNewStroke()
-        
-        renderingModel!.touchesEndedBody()
-        storeCurrentStroke()
+        do {
+            renderingModel?.ink?.pointerDataProvider.add(phase: .end, touches: touches, event: event!, view: view)
+            //renderingModel!.ink!.add(phase: .end, touches: touches, event: event!, view: view)
+           
+           try renderNewStroke()
+           
+           renderingModel!.touchesEndedBody()
+           storeCurrentStroke()
+        } catch {
+            NSException(name:NSExceptionName(rawValue: "RenderingController.touchesEnded"), reason:"\(error)", userInfo:nil).raise()
+        }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        renderingModel!.ink!.resetBuilder()
+//        renderingModel!.ink!.resetBuilder()
 //
 //        clearLayers()
 //
@@ -196,7 +203,7 @@ class RenderingController: UIViewController {
 //        mustPresent = true
 //    }
     
-    func renderNewStroke() {
+    func renderNewStroke() throws {
         renderingContext?.setTarget(currentStrokeLayer)
         renderingModel!.initPath()
         try! renderingModel!.drawingAddedPath(renderingContext: renderingContext!)
@@ -271,10 +278,10 @@ class RenderingController: UIViewController {
         currentStrokeLayer = graphics!.createLayer(bounds: bounds, scale: scale)//CGRect(x: 40, y: 150, width: 550, height: 720), scale: scale)
     }
     
-    func drawBody()
+    func drawBody() throws
     {
         if renderingModel!.ink!.hasNewPoints {
-            renderNewStroke()
+            try renderNewStroke()
             graphics?.present()
         }
         else if mustPresent {
@@ -295,7 +302,11 @@ extension RenderingController: MTKViewDelegate
     func draw(in view: MTKView) {
         // drawing code goes here
         autoreleasepool {
-            drawBody()
+            do {
+                try drawBody()
+            } catch {
+                NSException(name:NSExceptionName(rawValue: "RenderingModel.draw"), reason:"\(error)", userInfo:nil).raise()
+            }
         }
     }
 }
