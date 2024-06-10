@@ -4,6 +4,11 @@
 
 ## History
 
+
+### 5.1.1	20 August 2022
+	* New demos for updated pipeline
+	* General improvements to WacomInk & Serialization 
+
 ### 4.1.0   15 Oct 2021
     * Data encoding process improvements and introduction of compression
 
